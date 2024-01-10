@@ -592,7 +592,7 @@ resp_body_records <- function(resp,
     records <- select_cols(
       tidyselect::any_of(metadata),
       .data = records,
-      call = call
+      error_call = call
     )
 
     record_nm <- names(records)
@@ -652,6 +652,6 @@ arrange_record_cols <- function(records,
   select_cols(
     tidyselect::any_of(c(metadata_nm, model_nm)),
     .data = records,
-    call = call
+    error_call = call
   )
 }

@@ -132,7 +132,7 @@ make_list_of_lists <- function(data,
     data <- select_cols(
       tidyselect::any_of(cols),
       .data = data,
-      call = call
+      error_call = call
     )
   }
 

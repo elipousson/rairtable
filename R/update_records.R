@@ -312,22 +312,41 @@ get_data_columns <- function(data,
 #' Get names of selected columns
 #'
 #' @noRd
-get_data_colnames <- function(..., .data, .drop = FALSE, call = caller_env()) {
-  names(select_cols(..., .data = .data, .drop = .drop, call = call))
+get_data_colnames <- function(...,
+                              .data,
+                              call = caller_env()) {
+  names(select_cols(..., .data = .data, error_call = call))
 }
 
 #' Use tidyselect to pull a column from a data frame
 #'
 #' @noRd
 #' @importFrom tidyselect eval_select
-#' @importFrom rlang expr
-select_cols <- function(..., .data, .drop = FALSE, call = caller_env()) {
-  .data[,
-    tidyselect::eval_select(
-      expr(c(...)),
-      data = .data,
-      error_call = call
-    ),
-    drop = .drop
-  ]
+select_cols <- function(...,
+                        .data,
+                        .field = NULL,
+                        .strict = TRUE,
+                        .include = NULL,
+                        .exclude = NULL,
+                        .name_spec = NULL,
+                        .allow_rename = TRUE,
+                        .allow_empty = TRUE,
+                        .allow_predicates = TRUE,
+                        .env = caller_env(),
+                        error_call = caller_env()) {
+  pos <- tidyselect::eval_select(
+    expr = expr(c({{ .field }}, ...)),
+    data = .data,
+    env = .env,
+    strict = .strict,
+    include = .include,
+    exclude = .exclude,
+    name_spec = .name_spec,
+    allow_rename = .allow_rename,
+    allow_empty = .allow_empty,
+    allow_predicates = .allow_predicates,
+    error_call = error_call
+  )
+
+  set_names(.data[pos], names(pos))
 }
