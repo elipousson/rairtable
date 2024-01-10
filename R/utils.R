@@ -6,50 +6,6 @@
   )
 }
 
-# ---
-# repo: r-lib/rlang
-# file: standalone-purrr.R
-# last-updated: 2023-02-23
-# license: https://unlicense.org
-# imports: rlang
-# ---
-#' map and keep (from standalone-purrr.R)
-#'
-#' @noRd
-map <- function(.x, .f, ...) {
-  .f <- rlang::as_function(.f, env = rlang::global_env())
-  lapply(.x, .f, ...)
-}
-
-#' @noRd
-map_lgl <- function(.x, .f, ...) {
-  .rlang_purrr_map_mold(.x, .f, logical(1), ...)
-}
-
-#' @noRd
-.rlang_purrr_map_mold <- function(.x, .f, .mold, ...) {
-  .f <- as_function(.f, env = global_env())
-  out <- vapply(.x, .f, .mold, ..., USE.NAMES = FALSE)
-  names(out) <- names(.x)
-  out
-}
-
-#' @noRd
-keep <- function(.x, .f, ...) {
-  .x[.rlang_purrr_probe(.x, .f, ...)]
-}
-
-#' @noRd
-.rlang_purrr_probe <- function(.x, .p, ...) {
-  if (is_logical(.p)) {
-    stopifnot(length(.p) == length(.x))
-    .p
-  } else {
-    .p <- as_function(.p, env = global_env())
-    map_lgl(.x, .p, ...)
-  }
-}
-
 #' Wrapper for cli::cli_progress_along
 #'
 #' @param action String with the action to display in the progress message.
