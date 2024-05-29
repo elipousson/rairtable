@@ -20,7 +20,7 @@ download_attachment_field <- function(data,
                                       call = caller_env()) {
   if (!is.null(field)) {
     check_data_frame(data, call = call)
-    data <- select_cols(.data = data, .field = field, call = call)
+    data <- select_cols(tidyselect::any_of(field), .data = data, call = call)
     ncol_data <- ncol(data)
 
     if (ncol_data > 1) {

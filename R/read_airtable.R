@@ -167,7 +167,11 @@ list_records <- function(airtable = NULL,
 
   if (!is_null(model) && simplifyVector) {
     # Reorder columns to match order in model if supplied
-    records <- arrange_record_cols(records, metadata, model)
+    records <- arrange_record_cols(
+      records = records,
+      metadata = metadata,
+      model = model
+    )
   }
 
   records
@@ -649,8 +653,10 @@ arrange_record_cols <- function(records,
     model_nm <- names_at(model[["fields"]])
   }
 
+  cols <- c(metadata_nm, model_nm)
+
   select_cols(
-    tidyselect::any_of(c(metadata_nm, model_nm)),
+    tidyselect::any_of(cols),
     .data = records,
     error_call = call
   )

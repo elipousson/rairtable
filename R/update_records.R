@@ -263,7 +263,7 @@ get_record_id_col <- function(data,
       )
     }
 
-    data <- select_cols(tidyselect::all_of(id_col), .data = data, call = call)
+    data <- select_cols(tidyselect::all_of(id_col), .data = data, error_call = call)
     n_cols <- ncol(data)
 
     if (n_cols != 1) {
@@ -306,7 +306,7 @@ get_data_columns <- function(data,
     data <- data[, names(data) != id_col, drop = FALSE]
   }
 
-  select_cols(columns, .data = data, call = call)
+  select_cols(columns, .data = data, error_call = call)
 }
 
 #' Get names of selected columns
@@ -335,7 +335,7 @@ select_cols <- function(...,
                         .env = caller_env(),
                         error_call = caller_env()) {
   pos <- tidyselect::eval_select(
-    expr = expr(c({{ .field }}, ...)),
+    expr = expr(...),
     data = .data,
     env = .env,
     strict = .strict,
