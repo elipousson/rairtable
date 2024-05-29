@@ -14,7 +14,7 @@ License: MIT + file LICENSE
 URL: https://matthewjrogers.github.io/rairtable/
 BugReports: https://github.com/matthewjrogers/rairtable/issues
 Imports: 
-    cli,
+    cli (>= 2.5.0),
     glue,
     httr2 (>= 0.2.3),
     lifecycle,
