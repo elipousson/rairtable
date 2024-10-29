@@ -11,6 +11,7 @@ Create, read, update, and delete Airtable records or read base metadata using th
 \seealso{
 Useful links:
 \itemize{
+  \item \url{https://github.com/matthewjrogers/rairtable}
   \item \url{https://matthewjrogers.github.io/rairtable/}
   \item Report bugs at \url{https://github.com/matthewjrogers/rairtable/issues}
 }
