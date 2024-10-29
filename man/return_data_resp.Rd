@@ -9,7 +9,7 @@ return_data_resp(data = NULL, resp = NULL, return_data = TRUE)
 \arguments{
 \item{data}{Input data frame or list}
 
-\item{resp}{A response object.}
+\item{resp}{A httr2 \link[httr2]{response} object, created by \code{\link[httr2:req_perform]{req_perform()}}.}
 
 \item{return_data}{If \code{FALSE}, return JSON response from the Airtable web API
 as a list. If \code{TRUE} (default) and data is not \code{NULL}, return input data
