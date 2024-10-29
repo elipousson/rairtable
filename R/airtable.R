@@ -181,20 +181,24 @@ vec_ptype_full.airtable <- function(x, ...) {
 print.airtable <- function(x, ...) {
   cli::cli_text("{.cls {class(x)}}")
 
+  rule_msg <- ""
+
   if (!is_empty(x$description)) {
-    cli::cli_rule("{.valuel {x$description}}")
-  } else {
-    cli::cli_rule()
+    rule_msg <- "{.valuel {x$description}}"
   }
+
+  cli::cli_rule(rule_msg)
 
   text <- c("*" = "Base: {.field {x$base}}")
 
   if (!is_empty(x$table)) {
+    tbl_msg <- "Table: {.val {x$name}} - {.field {x$table}}"
+
     if (is_empty(x$name)) {
-      text <- c(text, "*" = "Table: {.field {x$table}}")
-    } else {
-      text <- c(text, "*" = "Table: {.val {x$name}} - {.field {x$table}}")
+      tbl_msg <- "Table: {.field {x$table}}"
     }
+
+    text <- c(text, "*" = tbl_msg)
   }
 
   if (!is_empty(x$view)) {
