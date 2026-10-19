@@ -56,6 +56,11 @@ check_airtable_obj <- function(x,
   if (require_url) {
     url <- x[["request_url"]]
 
+    if (is_true(require_table) && !is_table_id(x[["table"]])) {
+      # The request URL for a table name has no table ID to look for
+      require_table <- x[["table"]]
+    }
+
     check_airtable_api_url(
       url,
       require_table = require_table,

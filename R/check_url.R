@@ -142,7 +142,7 @@ set_missing_url_message <- function(url,
     missing <- c(missing, "a table ID starting with {.val tbl}")
   }
 
-  if (is_string(require_table) && !grepl(require_table, url)) {
+  if (is_string(require_table) && !has_table_name(url, require_table)) {
     missing <- c(missing, "a table named {.val {require_table}}")
   }
 
@@ -151,6 +151,19 @@ set_missing_url_message <- function(url,
   }
 
   missing
+}
+
+#' Does the url include the table name (raw or percent-encoded)?
+#'
+#' @noRd
+has_table_name <- function(url, table_name) {
+  any(
+    vapply(
+      c(table_name, encode_url_path(table_name)),
+      function(x) grepl(x, url, fixed = TRUE),
+      TRUE
+    )
+  )
 }
 
 #' Does the parsed values from a URL included required IDs?

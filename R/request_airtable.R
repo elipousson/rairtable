@@ -196,14 +196,24 @@ request_airtable_api_url <- function(base = NULL,
     req <- httr2::req_url_path_append(req, base)
   }
 
-  check_string(table, allow_empty = FALSE, allow_null = !require_table)
+  check_string(
+    table,
+    allow_empty = FALSE,
+    allow_null = !require_table,
+    call = call
+  )
 
   if (!is_empty(table)) {
     check_string(table, allow_empty = FALSE, call = call)
-    req <- httr2::req_url_path_append(req, table)
+    req <- httr2::req_url_path_append(req, encode_url_path(table))
   }
 
-  check_string(view, allow_empty = FALSE, allow_null = !require_view)
+  check_string(
+    view,
+    allow_empty = FALSE,
+    allow_null = !require_view,
+    call = call
+  )
 
   req_airtable_view(req, view = view, call = call)
 }
@@ -368,6 +378,16 @@ airtable_error_body <- function(resp) {
   }
 
   c(as.character(error), message)
+}
+
+#' Percent-encode a table name for use as a URL path segment
+#'
+#' Table IDs are unchanged. Table names may contain spaces or characters like
+#' "/", "?", or "#" that change the meaning of a URL if left unencoded.
+#'
+#' @noRd
+encode_url_path <- function(x) {
+  utils::URLencode(x, reserved = TRUE)
 }
 
 #' Add view query to URL if view is not already part of the request URL
