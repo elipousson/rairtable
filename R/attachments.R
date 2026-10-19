@@ -20,7 +20,7 @@ download_attachment_field <- function(data,
                                       call = caller_env()) {
   if (!is.null(field)) {
     check_data_frame(data, call = call)
-    data <- select_cols(tidyselect::any_of(field), .data = data, call = call)
+    data <- select_cols(tidyselect::any_of(field), .data = data, error_call = call)
     ncol_data <- ncol(data)
 
     if (ncol_data > 1) {
@@ -35,15 +35,17 @@ download_attachment_field <- function(data,
 
   url_list <- attachment_to_url_list(data)
 
+  # File names come from the Airtable base so only use the last path component
+  # to keep files inside path
+  filenames <- make.unique(basename(names(url_list)))
+  path <- path %||% getwd()
+
   walk(
     seq_along(url_list),
-    \(i) {
-      download.file(
+    function(i) {
+      utils::download.file(
         url = url_list[[i]],
-        destfile = file.path(
-          path %||% getwd(),
-          names(url_list)[[i]]
-        ),
+        destfile = file.path(path, filenames[[i]]),
         ...
       )
     }
@@ -55,11 +57,11 @@ download_attachment_field <- function(data,
 #' @param data Attachment data frame list column.
 #' @noRd
 attachment_to_url_list <- function(.l, filename = NULL) {
-  url <- map(.l, \(x) {
+  url <- map(.l, function(x) {
     x[["url"]]
   })
 
-  filename <- filename %||% map(.l, \(x) {
+  filename <- filename %||% map(.l, function(x) {
     x[["filename"]]
   })
 
