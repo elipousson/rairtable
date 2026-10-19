@@ -208,11 +208,6 @@ is_airtable_table_schema <- function(x) {
 }
 
 #' @export
-format.airtable_base_schema <- function(x, ...) {
-  formatC(vctrs::vec_data(x))
-}
-
-#' @export
 vec_ptype_abbr.airtable_base_schema <- function(x, ...) {
   "atbl_app"
 }
@@ -239,11 +234,6 @@ print.airtable_base_schema <- function(x, ...) {
   )
 
   invisible(x)
-}
-
-#' @export
-format.airtable_table_schema <- function(x, ...) {
-  formatC(vctrs::vec_data(x))
 }
 
 #' @export
@@ -275,11 +265,6 @@ print.airtable_table_schema <- function(x, ...) {
   )
 
   invisible(x)
-}
-
-#' @export
-format.airtable_fields_schema <- function(x, ...) {
-  formatC(vctrs::vec_data(x))
 }
 
 #' @export

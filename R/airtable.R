@@ -161,12 +161,6 @@ new_airtable_obj <- function(base,
 }
 
 #' @export
-#' @importFrom vctrs vec_data
-format.airtable <- function(x, ...) {
-  formatC(vctrs::vec_data(x))
-}
-
-#' @export
 vec_ptype_abbr.airtable <- function(x, ...) {
   "atbl"
 }
