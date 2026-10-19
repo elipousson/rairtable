@@ -375,7 +375,6 @@ req_records_fields <- function(req,
     )
   }
 
-  req <- req_remove_airtable_view(req, remove_view = TRUE)
   fields <- set_names(fields, "fields[]")
   rlang::exec(httr2::req_url_query, req, !!!fields)
 }
