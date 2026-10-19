@@ -45,6 +45,14 @@ airtable <- function(table = NULL,
                      token = NULL,
                      require_table = TRUE,
                      ...) {
+  if (lifecycle::is_present(api_version)) {
+    lifecycle::deprecate_warn(
+      when = "0.2.0",
+      what = "airtable(api_version)",
+      details = "The API version is now part of the default `api_url`."
+    )
+  }
+
   atbl <- new_airtable_obj(
     base = base,
     table = table,
@@ -53,13 +61,9 @@ airtable <- function(table = NULL,
     name = name,
     description = description,
     api_url = api_url,
-    token = token
+    token = token,
+    require_table = require_table
   )
-
-  # Set require_table to table if table appears to be a table name
-  if (!is_table_id(table) && !is_url(table)) {
-    require_table <- table
-  }
 
   check_airtable_obj(
     atbl,
