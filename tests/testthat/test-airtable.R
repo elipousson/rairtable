@@ -12,6 +12,7 @@ test_that("airtable errors", {
 
 httptest2::with_mock_dir("airtable", {
   test_that("airtable works", {
+    skip_if_no_test_url()
     url <- get_rairtable_test_url()
     ids <- parse_airtable_url(url)
 

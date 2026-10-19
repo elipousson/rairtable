@@ -33,7 +33,7 @@ test_that("create_field errors", {
 
   expect_error(
     create_field(name = ""),
-    '`name` must be a single string, not the empty string "".'
+    '`name` must be a valid name, not the empty string "".'
   )
 
   expect_error(

@@ -13,6 +13,14 @@ set_rairtable_test_url <- function(url) {
   Sys.setenv("rairtable.test_url" = url)
 }
 
+# Skip test if the test URL is not set
+skip_if_no_test_url <- function() {
+  skip_if_not(
+    nzchar(Sys.getenv("rairtable.test_url")),
+    "Set `rairtable.test_url` to run tests that use a test base."
+  )
+}
+
 # Get the test URL with get_rairtable_test_url
 get_rairtable_test_url <- function() {
   c("rairtable.test_url" = Sys.getenv("rairtable.test_url"))

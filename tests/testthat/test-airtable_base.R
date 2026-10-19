@@ -6,7 +6,7 @@ test_that("airtable_base errors", {
 
 httptest2::with_mock_dir("airtable_base", {
   test_that("airtable_base works", {
-    # skip_if_no_pat()
+    skip_if_no_test_url()
     url <- get_rairtable_test_url()
     ids <- parse_airtable_url(as.character(url))
 
