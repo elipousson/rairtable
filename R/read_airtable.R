@@ -313,6 +313,7 @@ req_list_records <- function(req = NULL,
       req,
       sort = sort,
       direction = direction,
+      model = model,
       call = call
     )
   }
