@@ -16,7 +16,10 @@
 #' - For [get_table_model()], additional parameters can include airtable or url
 #' (one of which is required if table is `NULL`).
 #' @returns
-#'  - [airtable_base()] returns an `airtable_base_schema` object.
+#'  - [airtable_base()] returns a list with the base ID ("base"), an
+#'  `airtable_base_schema` object ("schema"), and a list of `airtable` objects
+#'  for each table in the base ("tables"). The description of each `airtable`
+#'  object is the name of the base.
 #'  - [get_base_schema()] returns the response from the Airtable get base schema
 #'  API method
 #'  - [get_table_models()] returns a tibble with the list of tables
@@ -28,8 +31,8 @@
 #' \dontrun{
 #' base <- airtable_base("appXXXXXXXXXXXXX")
 #'
-#' # read 'table1' from the base
-#' tbl_data <- read_airtable(base$table1)
+#' # read 'Table 1' from the base
+#' tbl_data <- read_airtable(base$tables[["Table 1"]])
 #'
 #' # view base schema
 #' print(base$schema)
@@ -67,20 +70,28 @@ airtable_base <- function(base = NULL,
     )
   }
 
+  # Get the base name once to use as the description of every table (otherwise
+  # airtable() looks it up with a separate API call for each table)
+  base_name <- list_bases(bases = base, token = token)[["name"]]
+
   list(
     "base" = base,
     "schema" = base_schema,
-    "tables" = map(
-      base_schema,
-      function(tbl) {
-        airtable(
-          table = tbl[["id"]],
-          name = tbl[["name"]],
-          description = tbl[["description"]],
-          fields = as.list(names(tbl[["fields"]])),
-          base = base
-        )
-      }
+    "tables" = set_names(
+      map(
+        base_schema,
+        function(tbl) {
+          airtable(
+            table = tbl[["id"]],
+            name = tbl[["name"]],
+            description = base_name,
+            fields = as.list(names(tbl[["fields"]])),
+            base = base,
+            token = token
+          )
+        }
+      ),
+      names_at(base_schema, "name")
     )
   )
 }
