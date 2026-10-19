@@ -229,7 +229,7 @@ req_update_record <- function(req = NULL,
                               ...,
                               record,
                               data,
-                              typecast = TRUE,
+                              typecast = FALSE,
                               method = NULL,
                               token = NULL,
                               call = caller_env()) {

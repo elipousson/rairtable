@@ -9,10 +9,9 @@
 #' @param fields_by_id If `TRUE`, the response to the API request is keyed by
 #'   field IDs instead of field names. This response is only returned if
 #'   `return_data = FALSE`.
-#' @param typecast If `TRUE` (default), values will be converted to match the
-#'   base if possible. typecase must be set to `TRUE` to add new values to a
-#'   multiselect field type.
-#'   base. Required.
+#' @param typecast If `TRUE`, values will be converted to match the base if
+#'   possible. typecast must be set to `TRUE` to add new values to a
+#'   multiselect field type. Defaults to `FALSE`.
 #' @inheritParams req_airtable
 #' @inheritParams rlang::args_error_context
 #' @returns Invisibly return response from API call.
@@ -23,7 +22,7 @@ req_create_records <- function(req = NULL,
                                ...,
                                data,
                                fields_by_id = FALSE,
-                               typecast = TRUE,
+                               typecast = FALSE,
                                token = NULL,
                                call = caller_env()) {
   req <- req %||%
