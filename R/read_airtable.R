@@ -60,6 +60,14 @@ read_airtable <- function(airtable = NULL,
                           .name_repair = "unique",
                           token = NULL,
                           ...) {
+  if (lifecycle::is_present(max_rows)) {
+    lifecycle::deprecate_warn(
+      when = "0.2.0",
+      what = "read_airtable(max_rows)",
+      details = "Use `list_records(max_records)` to limit the number of records."
+    )
+  }
+
   req <- req_airtable(
     .req = request_airtable(
       airtable = airtable,

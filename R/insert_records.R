@@ -22,6 +22,14 @@ insert_records <- function(data,
                            batch_size = deprecated(),
                            return_data = TRUE,
                            ...) {
+  if (lifecycle::is_present(batch_size)) {
+    lifecycle::deprecate_warn(
+      when = "0.2.0",
+      what = "insert_records(batch_size)",
+      details = "Set the batch size with the `rairtable.batch_size` option."
+    )
+  }
+
   # TODO: Add support for inserting records from a list
   check_data_frame(data)
 
