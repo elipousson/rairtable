@@ -55,7 +55,7 @@ update_records <- function(data,
       getOption("rairtable.id_col", "airtable_record_id")
     records <- get_record_id_col(data = data, id_col = airtable_id_col)
   } else if (all(is_url(records))) {
-    records <- parse_url_record_id(records)
+    records <- get_record_ids_from_urls(records)
   }
 
   check_character(records)

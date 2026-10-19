@@ -71,7 +71,7 @@ delete_records <- function(data = NULL,
       )
     }
   } else if (all(is_url(records))) {
-    records <- parse_url_record_id(records)
+    records <- get_record_ids_from_urls(records)
   }
 
   check_character(records)

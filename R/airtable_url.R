@@ -216,12 +216,27 @@ parse_url_workspace_id <- function(url) {
   string_extract(url, workspace_pattern)
 }
 
-#' Extract pattern from a length 1 string
+#' Extract pattern from a string or character vector
+#'
+#' Returns `NULL` if a length 1 string does not match the pattern or `NA` for
+#' any element of a longer vector that does not match.
 #'
 #' @param string Passed to x parameter of [regmatches()]
 #' @inheritParams base::regexpr
 #' @noRd
 string_extract <- function(string, pattern, perl = TRUE) {
+  if (length(string) > 1) {
+    # Unmatched elements are NA to keep the result aligned with string
+    return(
+      vapply(
+        string,
+        function(x) string_extract(x, pattern, perl) %||% NA_character_,
+        NA_character_,
+        USE.NAMES = FALSE
+      )
+    )
+  }
+
   if (is.na(string)) {
     return(NA_character_)
   }

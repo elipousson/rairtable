@@ -191,6 +191,24 @@ get_record_id <- function(record = NULL,
   )
 }
 
+#' Get Airtable record IDs from a vector of record URLs
+#'
+#' @noRd
+get_record_ids_from_urls <- function(url,
+                                     arg = caller_arg(url),
+                                     call = caller_env()) {
+  ids <- parse_url_record_id(url)
+
+  if (is_null(ids) || anyNA(ids)) {
+    cli_abort(
+      "{.arg {arg}} must be record IDs or URLs with a record ID.",
+      call = call
+    )
+  }
+
+  ids
+}
+
 #' Get an Airtable workspace ID from a string or URL
 #'
 #' Return the provided workspace ID or a workspace ID parsed from a URL.
