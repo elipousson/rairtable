@@ -33,24 +33,34 @@ is_airtable_fields_schema <- function(x) {
 #'
 #' @noRd
 check_airtable_fields_schema <- function(fields, call = caller_env()) {
-  if (any(vapply(fields, length, NA_integer_)) < 3) {
+  require_names <- c("name", "id", "type")
+  allow_names <- c(require_names, "description", "options")
+  fields_names <- lapply(fields, names)
+
+  has_required <- vapply(
+    fields_names,
+    function(nm) all(require_names %in% nm),
+    TRUE
+  )
+
+  if (!all(has_required)) {
     cli_abort(
-      "Every item in {.arg fields} must be length 3 or longer with
-        names {.val {c('name', 'id', 'data')}}.",
+      "Every item in {.arg fields} must be a list with the names
+      {.val {require_names}}.",
       call = call
     )
   }
 
-  # TODO: Double-check if "description" should be added to the allowed names
-  allow_names <- c("type", "id", "name", "options")
-  fields_names <- vapply(fields, FUN = names, FUN.VALUE = NA_character_)
+  extra_names <- setdiff(unlist(fields_names), allow_names)
 
-  if (!all(fields_names %in% allow_names)) {
+  if (length(extra_names) > 0) {
     cli_abort(
       "{.arg fields} names must be
-      {.val {cli::cli_vec(allow_names, style = c(`vec-last` = 'or'))}},
-      not {.val {fields_names[!(fields_names %in% allow_names)]}}.",
+      {.val {cli::cli_vec(allow_names, style = list('vec-last' = ', or '))}},
+      not {.val {extra_names}}.",
       call = call
     )
   }
+
+  invisible(NULL)
 }
