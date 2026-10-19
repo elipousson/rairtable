@@ -106,7 +106,7 @@ create_table <- function(airtable = NULL,
 
   body <- httr2::resp_body_json(resp)
 
-  table_url <- paste0(
+  table_url <- paste(
     getOption("rairtable.base_url", "https://airtable.com"),
     base,
     body[["id"]],
@@ -158,7 +158,7 @@ update_table <- function(airtable = NULL,
     message <- c(message, cli::cli_fmt(cli::cli_bullets("description updated to {.val {description}}")))
   }
 
-  table_url <- paste0(
+  table_url <- paste(
     getOption("rairtable.base_url", "https://airtable.com"),
     parse_url_base_id(resp[["url"]]),
     parse_url_table_id(resp[["url"]]),
