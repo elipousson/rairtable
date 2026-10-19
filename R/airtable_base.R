@@ -219,15 +219,21 @@ vec_ptype_full.airtable_base_schema <- function(x, ...) {
 
 #' @export
 print.airtable_base_schema <- function(x, ...) {
-  cli::cli_text("{.cls {class(x)}}")
+  cli::cli_text("{.cls {class(x)[[1]]}}")
 
   n_tbls <- length(x)
   cli::cli_text("{cli::symbol$line} {n_tbls} table{?s}:")
 
+  # Table names and IDs are substituted by cli rather than pasted into the
+  # message so braces in a name are not evaluated
+  tbl_names <- names_at(x, "name")
+  tbl_ids <- names_at(x, "id")
+
   cli::cli_bullets(
     set_names(
-      paste0(
-        "{.value ", names_at(x, "name"), "} - {.field ", names_at(x, "id"), "}"
+      sprintf(
+        "{.val {tbl_names[[%1$d]]}} - {.field {tbl_ids[[%1$d]]}}",
+        seq_len(n_tbls)
       ),
       rep_len("*", n_tbls)
     )
@@ -249,7 +255,7 @@ vec_ptype_full.airtable_table_schema <- function(x, ...) {
 
 #' @export
 print.airtable_table_schema <- function(x, ...) {
-  cli::cli_text("{.cls {class(x)}}")
+  cli::cli_text("{.cls {class(x)[[1]]}}")
 
   fields <- cli::cli_vec(
     names_at(x$fields),
@@ -279,14 +285,19 @@ vec_ptype_full.airtable_fields_schema <- function(x, ...) {
 
 #' @export
 print.airtable_fields_schema <- function(x, ...) {
-  cli::cli_text("{.cls {class(x)}}")
+  cli::cli_text("{.cls {class(x)[[1]]}}")
 
   n_fields <- length(x)
   cli::cli_text("{cli::symbol$line} {n_fields} field{?s}:")
+
+  fld_names <- names_at(x, "name")
+  fld_types <- names_at(x, "type")
+
   cli::cli_bullets(
     set_names(
-      paste0(
-        "{.field ", names_at(x, "name"), "} - {.code ", names_at(x, "type"), "}"
+      sprintf(
+        "{.field {fld_names[[%1$d]]}} - {.code {fld_types[[%1$d]]}}",
+        seq_len(n_fields)
       ),
       rep_len("*", n_fields)
     )

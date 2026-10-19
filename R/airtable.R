@@ -173,12 +173,12 @@ vec_ptype_full.airtable <- function(x, ...) {
 #' @export
 #' @importFrom cli cli_text cli_rule cli_bullets
 print.airtable <- function(x, ...) {
-  cli::cli_text("{.cls {class(x)}}")
+  cli::cli_text("{.cls {class(x)[[1]]}}")
 
   rule_msg <- ""
 
   if (!is_empty(x$description)) {
-    rule_msg <- "{.valuel {x$description}}"
+    rule_msg <- "{.val {x$description}}"
   }
 
   cli::cli_rule(rule_msg)
