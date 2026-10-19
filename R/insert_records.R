@@ -33,7 +33,7 @@ insert_records <- function(data,
   # TODO: Add support for inserting records from a list
   check_data_frame(data)
 
-  if (is_empty(data)) {
+  if (nrow(data) == 0 || ncol(data) == 0) {
     cli_abort("{.arg data} can't be an empty data frame.")
   }
 

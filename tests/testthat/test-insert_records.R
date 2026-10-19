@@ -21,3 +21,14 @@ test_that("insert_records passes typecast to every batch", {
   expect_true(captured$requests[[3]]$typecast)
   expect_true(captured$requests[[4]]$typecast)
 })
+
+test_that("insert_records errors for a data frame with no rows or columns", {
+  withr::local_envvar(AIRTABLE_PAT = "test_pat")
+  atbl <- airtable("tblabc123", "appxyz123", description = "Test base")
+
+  expect_error(
+    insert_records(data.frame(Name = character()), atbl),
+    "empty"
+  )
+  expect_error(insert_records(data.frame(), atbl), "empty")
+})
