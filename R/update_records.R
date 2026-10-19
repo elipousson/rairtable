@@ -267,20 +267,20 @@ req_update_record <- function(req = NULL,
 get_record_id_col <- function(data,
                               id_col = NULL,
                               id_col_arg = caller_arg(id_col),
-                              id_from_col = TRUE,
                               call = caller_env()) {
   check_data_frame(data, call = call)
-
-  if (!id_from_col && tibble::has_rownames(data)) {
-    return(row.names(data))
-  }
 
   id_col <- id_col %||%
     getOption("rairtable.id_col", "airtable_record_id")
 
-  if (is_string(id_col) && (id_col != "")) {
-    check_data_frame(data, call = call)
+  has_id_col <- is_string(id_col) && (id_col != "") && has_name(data, id_col)
 
+  # Data read with id_to_col = FALSE has record IDs as rownames
+  if (!has_id_col && tibble::has_rownames(data)) {
+    return(row.names(data))
+  }
+
+  if (is_string(id_col) && (id_col != "")) {
     if (is_empty(data)) {
       cli_abort(
         "{.arg data} can't be empty.",
