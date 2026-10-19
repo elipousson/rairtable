@@ -41,14 +41,7 @@ request_airtable_meta <- function(url = NULL,
       error_call = call
     )
 
-    base_required <- !(meta %in% c("create_base", "list_base"))
-    table_required <- meta %in% c("update_table", "update_field", "create_field")
-    column_required <- (meta == "update_field")
-  }
-
-
-  template <- template %||%
-    paste0(
+    template <- paste0(
       "meta/bases",
       switch(meta,
         "create_base" = "",
@@ -60,6 +53,12 @@ request_airtable_meta <- function(url = NULL,
         "update_field" = "/{base}/tables/{table}/fields/{column}"
       )
     )
+  }
+
+  # Require the base, table, and column IDs used by the template
+  base_required <- grepl("{base}", template, fixed = TRUE)
+  table_required <- grepl("{table}", template, fixed = TRUE)
+  column_required <- grepl("{column}", template, fixed = TRUE)
 
   if (base_required) {
     base <- get_base_id(
