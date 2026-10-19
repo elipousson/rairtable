@@ -125,7 +125,7 @@ get_table_id <- function(table = NULL,
   }
 
   if (is_airtable_obj(table)) {
-    return(airtable[["table"]])
+    return(table[["table"]])
   }
 
   if (is_url(table)) {
