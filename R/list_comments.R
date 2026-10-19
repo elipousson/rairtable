@@ -32,7 +32,6 @@ list_comments <- function(airtable = NULL,
   comments <- body[["comments"]]
   offset <- body[["offset"]]
 
-  # pre-allocate space for data
   while (!is_null(body[["offset"]])) {
     req <- httr2::req_url_query(
       .req = req,
@@ -45,7 +44,7 @@ list_comments <- function(airtable = NULL,
     offset <- body[["offset"]]
   }
 
-  list_rbind(comments)
+  comments_to_tibble(comments)
 }
 
 #' @rdname list_comments
@@ -71,7 +70,7 @@ create_comment <- function(airtable = NULL,
 
   resp <- httr2::req_perform(req)
 
-  invisible(list_rbind(httr2::resp_body_json(resp)))
+  invisible(comments_to_tibble(list(httr2::resp_body_json(resp))))
 }
 
 #' @rdname list_comments
@@ -163,4 +162,28 @@ req_comments <- function(airtable = NULL,
     data = data,
     call = call
   )
+}
+
+#' Combine a list of comments into a tibble with one row for each comment
+#'
+#' The author of each comment is kept as a list column.
+#'
+#' @noRd
+#' @importFrom tibble as_tibble
+comments_to_tibble <- function(comments) {
+  if (is_empty(comments)) {
+    return(tibble::as_tibble(data.frame()))
+  }
+
+  rows <- lapply(
+    comments,
+    function(comment) {
+      comment <- vctrs::list_drop_empty(comment)
+      tibble::as_tibble(
+        lapply(comment, function(x) if (is.list(x)) list(x) else x)
+      )
+    }
+  )
+
+  tibble::as_tibble(list_rbind(rows))
 }
