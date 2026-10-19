@@ -574,6 +574,16 @@ resp_body_records <- function(resp,
     # Used by read_airtable and list_records
     records <- body[["records"]]
     fields <- records[["fields"]]
+
+    if (is_empty(records)) {
+      # An empty table or filter result is returned as an empty array which
+      # is simplified to an unnamed list
+      records <- data.frame(
+        "id" = character(),
+        "createdTime" = character()
+      )
+      fields <- data.frame()
+    }
   } else if (has_name(body, c("fields"))) {
     # Used by get_record
     fields <- body[["fields"]]
