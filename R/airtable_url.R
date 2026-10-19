@@ -144,7 +144,7 @@ parse_url_base_id <- function(url,
     base_url <- base_url %||%
       getOption("rairtable.base_url", "https://airtable.com")
 
-    base_pattern <- glue("(?<={base_url}/){base_name}(?=/)")
+    base_pattern <- glue("(?<={base_url}/){base_name}(?=/|\\?|$)")
 
     check_airtable_url(url, base_url, call = call)
   }

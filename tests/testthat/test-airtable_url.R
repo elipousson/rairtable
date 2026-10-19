@@ -67,3 +67,20 @@ test_that("check_airtable_api_url works", {
     check_airtable_api_url(atbl[["request_url"]])
   )
 })
+
+test_that("parse_airtable_url parses base urls without a trailing slash", {
+  expect_identical(
+    parse_airtable_url("https://airtable.com/appxyz123"),
+    list(base = "appxyz123")
+  )
+
+  expect_identical(
+    parse_airtable_url("https://airtable.com/appxyz123?foo=bar"),
+    list(base = "appxyz123")
+  )
+
+  expect_identical(
+    parse_airtable_url("https://airtable.com/appxyz123/tblabc123/viwdef456"),
+    list(base = "appxyz123", table = "tblabc123", view = "viwdef456")
+  )
+})
