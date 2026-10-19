@@ -49,3 +49,32 @@ test_that("list_comments, create_comment, and delete_comment work", {
   deleted <- delete_comment(atbl, record = "recabc123", comment = "comabc123")
   expect_identical(deleted[["deleted"]], TRUE)
 })
+
+test_that("comment functions use the supplied token", {
+  skip_if_not("redacted" %in% names(formals(httr2::req_get_headers)))
+  withr::local_envvar(AIRTABLE_PAT = "env_pat")
+  atbl <- airtable("tblabc123", "appxyz123", description = "Test base")
+  auth <- character()
+
+  httr2::local_mocked_responses(
+    function(req) {
+      auth <<- c(
+        auth,
+        httr2::req_get_headers(req, redacted = "reveal")[["Authorization"]]
+      )
+
+      switch(httr2::req_get_method(req),
+        "POST" = httr2::response_json(body = comment_fixture("comnew")),
+        "DELETE" = httr2::response_json(body = list(id = "comabc123")),
+        httr2::response_json(body = list(comments = list(comment_fixture("com1"))))
+      )
+    }
+  )
+
+  list_comments(atbl, record = "recabc123", token = "arg_pat")
+  create_comment(atbl, record = "recabc123", text = "hi", token = "arg_pat")
+  delete_comment(atbl, record = "recabc123", comment = "comabc123", token = "arg_pat")
+  list_comments(atbl, record = "recabc123")
+
+  expect_identical(auth, c(rep("Bearer arg_pat", 3), "Bearer env_pat"))
+})

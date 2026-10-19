@@ -4,6 +4,7 @@
 #' existing comment on an Airtable record.
 #'
 #' @inheritParams request_airtable
+#' @inheritParams req_auth_airtable
 #' @param record Record ID (a string starting with "rec") or an Airtable record
 #'   URL. If record is a URL, no additional parameters are required. Otherwise,
 #'   airtable, url, or base and table must be supplied.
@@ -19,10 +20,12 @@
 #' @export
 list_comments <- function(airtable = NULL,
                           record = NULL,
+                          token = NULL,
                           ...) {
   req <- req_comments(
     airtable = airtable,
     record = record,
+    token = token,
     ...,
     template = "{base}/{table}/{record}/comments"
   )
@@ -55,12 +58,14 @@ list_comments <- function(airtable = NULL,
 create_comment <- function(airtable = NULL,
                            record = NULL,
                            text,
+                           token = NULL,
                            ...) {
   check_string(text)
 
   req <- req_comments(
     airtable = airtable,
     record = record,
+    token = token,
     ...,
     template = "{base}/{table}/{record}/comments",
     data = list(
@@ -81,12 +86,14 @@ create_comment <- function(airtable = NULL,
 delete_comment <- function(airtable = NULL,
                            record = NULL,
                            comment,
+                           token = NULL,
                            ...) {
   check_required(comment)
 
   req <- req_comments(
     airtable = airtable,
     record = record,
+    token = token,
     ...,
     comment = comment,
     require_comment = TRUE,
@@ -110,6 +117,7 @@ req_comments <- function(airtable = NULL,
                          template = NULL,
                          method = NULL,
                          data = NULL,
+                         token = NULL,
                          require_record = TRUE,
                          require_comment = FALSE,
                          call = caller_env()) {
@@ -160,6 +168,7 @@ req_comments <- function(airtable = NULL,
     require_table = FALSE,
     method = method,
     data = data,
+    token = token,
     call = call
   )
 }
