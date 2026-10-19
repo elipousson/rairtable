@@ -83,17 +83,15 @@ model is used to validate fields and sort parameters and to arrange columns
 to match the order of the table model.}
 
 \item{.name_repair}{One of "unique" (default), "universal", "check_unique",
-"unique_quiet", or "universal_quiet" passed to \code{\link[vctrs:vec_bind]{vctrs::vec_cbind()}}. See
+"unique_quiet", or "universal_quiet" passed to \code{\link[vctrs:vec_cbind]{vctrs::vec_cbind()}}. See
 \link[vctrs:vec_as_names]{vctrs::vec_as_names} for the meaning of these options.}
 
 \item{token}{Airtable personal access token, Defaults to \code{NULL} which is set
 to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat]{get_airtable_pat()}}) or
 "AIRTABLE_API_KEY" (from \code{\link[=get_airtable_api_key]{get_airtable_api_key()}}).}
 
-\item{...}{For \code{\link[=read_airtable]{read_airtable()}}, additional query parameters, such as url,
-can be passed to \code{\link[=req_airtable]{req_airtable()}}. For \code{\link[=list_records]{list_records()}} and \code{\link[=get_record]{get_record()}},
-additional parameters are passed to \code{\link[=request_airtable]{request_airtable()}} and can also
-include base and table.}
+\item{...}{Additional parameters passed to \code{\link[=request_airtable]{request_airtable()}}, such as url
+or base and table, to identify the table to read if airtable is \code{NULL}.}
 
 \item{view}{Airtable view ID. View ID values starts with "viw". Optional if
 require_view is \code{FALSE}.}
@@ -122,7 +120,8 @@ the displayed character string.}
 "string", tz defaults to \code{Sys.timezone()} and locale defaults to
 \code{Sys.getlocale("LC_TIME")}.}
 
-\item{max_records}{Maximum number of records to return. Must be 100 or less.}
+\item{max_records}{Maximum number of records to return. Defaults to \code{NULL}
+which returns all records.}
 
 \item{page_size}{Maximum number of records to return per page.}
 
@@ -131,11 +130,11 @@ Options including "id", "createdTime", and "commentCount". Defaults to
 \code{c("id", "createdTime")}. If metadata is \code{NULL}, no additional fields are
 added to the returned data frame.}
 
-\item{offset}{Offset value to passed to \code{\link[httr2:req_url]{httr2::req_url_query()}} as part of
+\item{offset}{Offset value to passed to \code{\link[httr2:req_url_query]{httr2::req_url_query()}} as part of
 the API call. Intended for developer use only. See the \href{https://airtable.com/developers/web/api/list-records#response-offset}{Airtable API documentation on the offset value}
 is used by the Airtable API.}
 
-\item{simplifyVector}{Passed to \code{\link[httr2:req_body]{httr2::req_body_json()}}. If \code{FALSE},
+\item{simplifyVector}{Passed to \code{\link[httr2:req_body_json]{httr2::req_body_json()}}. If \code{FALSE},
 \code{\link[=get_record]{get_record()}} and \code{\link[=list_records]{list_records()}} both return named lists of records.}
 
 \item{record}{Record ID (a string starting with "rec"). Required for

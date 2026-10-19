@@ -12,8 +12,9 @@
 #' @inheritParams return_data_resp
 #' @param batch_size Deprecated. Set using the `rairtable.batch_size` option.
 #' @return A data frame (invisibly) of the input data, to be stored as an object
-#'   or piped into additional functions or, if as_json is `TRUE`, the function
-#'   returns the parsed API response from [httr2::resp_body_json()].
+#'   or piped into additional functions or, if return_data is `FALSE`, the
+#'   function returns the parsed API response from
+#'   [httr2::resp_body_json()].
 #'
 #' @export
 insert_records <- function(data,

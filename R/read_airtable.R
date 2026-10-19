@@ -34,10 +34,8 @@
 #' @param max_rows Deprecated. Maximum number of rows to read.
 #' @param simplifyVector Passed to [httr2::req_body_json()]. If `FALSE`,
 #'   [get_record()] and [list_records()] both return named lists of records.
-#' @param ... For [read_airtable()], additional query parameters, such as url,
-#'   can be passed to [req_airtable()]. For [list_records()] and [get_record()],
-#'   additional parameters are passed to [request_airtable()] and can also
-#'   include base and table.
+#' @param ... Additional parameters passed to [request_airtable()], such as url
+#'   or base and table, to identify the table to read if airtable is `NULL`.
 #' @inheritParams rlang::args_error_context
 #'
 #' @return A data frame with the records from the Airtable base and table
@@ -278,7 +276,8 @@ get_record <- function(airtable = NULL,
 #'   Options including "id", "createdTime", and "commentCount". Defaults to
 #'   `c("id", "createdTime")`. If metadata is `NULL`, no additional fields are
 #'   added to the returned data frame.
-#' @param max_records Maximum number of records to return. Must be 100 or less.
+#' @param max_records Maximum number of records to return. Defaults to `NULL`
+#'   which returns all records.
 #' @param page_size Maximum number of records to return per page.
 #' @keywords internal
 #' @importFrom httr2 req_url_query

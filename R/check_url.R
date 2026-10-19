@@ -80,9 +80,6 @@ check_airtable_url <- function(url,
 #' @param require_view If `TRUE`, the string "viw" must be included in the
 #'   string supplied to url. If `FALSE` (default), there is no check
 #'   for a view being present in the API request URL.
-#' @param require_view If `TRUE`, the string "viw" must be included in the
-#'   string supplied to url. If `FALSE` (default), there is no check
-#'   for a view being present in the API request URL.
 #' @keywords internal
 check_airtable_api_url <- function(url,
                                    require_base = TRUE,

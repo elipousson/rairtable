@@ -9,7 +9,7 @@ req_create_records(
   ...,
   data,
   fields_by_id = FALSE,
-  typecast = TRUE,
+  typecast = FALSE,
   token = NULL,
   call = caller_env()
 )
@@ -20,7 +20,7 @@ req_create_records(
 airtable parameters are ignored.}
 
 \item{...}{
-  Arguments passed on to \code{\link[=request_airtable]{request_airtable}}
+  Arguments passed on to \code{\link{request_airtable}}
   \describe{
     \item{\code{airtable}}{An airtable class object created with \code{\link[=airtable]{airtable()}}. airtable
 must include a request_url attribute. url is ignored if airtable is
@@ -37,6 +37,16 @@ both required if url and airtable are \code{NULL} and require_base is \code{TRUE
 with "tbl". Optional if require_table is \code{FALSE}.}
     \item{\code{view}}{Airtable view ID. View ID values starts with "viw". Optional if
 require_view is \code{FALSE}.}
+    \item{\code{.req}}{A request object created by \code{\link[httr2:request]{httr2::request()}} or
+\code{\link[=request_airtable]{request_airtable()}}. If .req is provided, any supplied url, api_url, or
+airtable parameters are ignored.}
+    \item{\code{template}}{Template for query parameters passed to
+\code{\link[httr2:req_template]{httr2::req_template()}}, Default: \code{NULL}.}
+    \item{\code{remove_view}}{If \code{TRUE} (default), remove view from request (only using
+view if it is explicitly passed as a query or template parameter). If
+\code{FALSE}, the request url for the supplied .req or created .req object may
+contain a view query parameter parsed from the url or view supplied to
+\code{\link[=airtable]{airtable()}} when creating an airtable object.}
     \item{\code{require_base}}{If \code{TRUE} (default), the string "app" must be included in
 the supplied API request URL.}
     \item{\code{require_table}}{If \code{TRUE}, the string "tbl" must be included in the
@@ -46,6 +56,13 @@ check for a table being present in the API request URL.}
     \item{\code{require_view}}{If \code{TRUE}, the string "viw" must be included in the
 string supplied to url. If \code{FALSE} (default), there is no check
 for a view being present in the API request URL.}
+    \item{\code{method}}{Custom HTTP method}
+    \item{\code{string}}{Passed to \code{\link[httr2:req_user_agent]{httr2::req_user_agent()}}, Default: \code{NULL} (set to
+\code{getOption("rairtable.useragent", default = "rairtable (https://github.com/matthewjrogers/rairtable)")})}
+    \item{\code{allow_key}}{If \code{TRUE}, allow use of an Airtable API key or an Airtable
+personal access token (PAT) to authenticate the request. The metadata API
+does not support the API key so allow_key is set to \code{FALSE} for any
+functions that call that API.}
   }}
 
 \item{data}{A data frame or list of records to create in Airtable. Column
@@ -56,10 +73,9 @@ Airtable base. Required.}
 field IDs instead of field names. This response is only returned if
 \code{return_data = FALSE}.}
 
-\item{typecast}{If \code{TRUE} (default), values will be converted to match the
-base if possible. typecase must be set to \code{TRUE} to add new values to a
-multiselect field type.
-base. Required.}
+\item{typecast}{If \code{TRUE}, values will be converted to match the base if
+possible. typecast must be set to \code{TRUE} to add new values to a
+multiselect field type. Defaults to \code{FALSE}.}
 
 \item{token}{Airtable personal access token, Defaults to \code{NULL} which is set
 to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat]{get_airtable_pat()}}) or

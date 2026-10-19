@@ -30,10 +30,9 @@ create_records(
 must include a request_url attribute. url is ignored if airtable is
 provided. Optional if url or base \emph{and} table are supplied.}
 
-\item{typecast}{If \code{TRUE} (default), values will be converted to match the
-base if possible. typecase must be set to \code{TRUE} to add new values to a
-multiselect field type.
-base. Required.}
+\item{typecast}{If \code{TRUE}, values will be converted to match the base if
+possible. typecast must be set to \code{TRUE} to add new values to a
+multiselect field type. Defaults to \code{FALSE}.}
 
 \item{batch_size}{Deprecated. Set using the \code{rairtable.batch_size} option.}
 
@@ -45,12 +44,13 @@ frame or list.}
 \code{\link[=parse_airtable_url]{parse_airtable_url()}} if an Airtable url is provided. For
 \code{\link[=req_airtable]{req_airtable()}}, additional parameters passed to
 \code{\link[httr2:req_template]{httr2::req_template()}} if template is not \code{NULL} or
-\code{\link[httr2:req_url]{httr2::req_url_query()}} if template is \code{NULL}.}
+\code{\link[httr2:req_url_query]{httr2::req_url_query()}} if template is \code{NULL}.}
 }
 \value{
 A data frame (invisibly) of the input data, to be stored as an object
-or piped into additional functions or, if as_json is \code{TRUE}, the function
-returns the parsed API response from \code{\link[httr2:resp_body_raw]{httr2::resp_body_json()}}.
+or piped into additional functions or, if return_data is \code{FALSE}, the
+function returns the parsed API response from
+\code{\link[httr2:resp_body_json]{httr2::resp_body_json()}}.
 }
 \description{
 Insert or create new records in an existing Airtable table from a data frame
