@@ -12,3 +12,4 @@
 ^README\.Rmd$
 ^data-raw$
 ^R/scratch\.R$
+^\.vscode$
