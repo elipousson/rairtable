@@ -1,6 +1,5 @@
 httptest2::with_mock_dir("create_field", {
   test_that("create_field works", {
-
     atbl <- get_rairtable_test_obj()
 
     atbl_recs <- list_records(atbl)

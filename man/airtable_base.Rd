@@ -77,7 +77,12 @@ base schema.}
 }
 \value{
 \itemize{
-\item \code{\link[=airtable_base]{airtable_base()}} returns an \code{airtable_base_schema} object.
+\item \code{\link[=airtable_base]{airtable_base()}} returns a list with the base ID ("base"), the base name
+("base_name"), an \code{airtable_base_schema} object ("schema"), and a named list
+of \code{airtable} objects for each table in the base ("tables"). The description
+of each \code{airtable} object is the description of the table in Airtable and
+is blank if the table has no description. The base name is stored
+separately as \code{base_name}.
 \item \code{\link[=get_base_schema]{get_base_schema()}} returns the response from the Airtable get base schema
 API method
 \item \code{\link[=get_table_models]{get_table_models()}} returns a tibble with the list of tables
@@ -93,8 +98,8 @@ function for \code{\link[=copy_table_config]{copy_table_config()}}.
 \dontrun{
 base <- airtable_base("appXXXXXXXXXXXXX")
 
-# read 'table1' from the base
-tbl_data <- read_airtable(base$table1)
+# read 'Table 1' from the base
+tbl_data <- read_airtable(base$tables[["Table 1"]])
 
 # view base schema
 print(base$schema)

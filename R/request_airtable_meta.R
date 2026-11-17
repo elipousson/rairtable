@@ -59,10 +59,6 @@ request_airtable_meta <- function(
   token = NULL,
   call = caller_env()
 ) {
-  base_required <- FALSE
-  table_required <- FALSE
-  column_required <- FALSE
-
   if (is_null(template)) {
     meta <- arg_match(
       meta,
@@ -78,19 +74,7 @@ request_airtable_meta <- function(
       error_call = call
     )
 
-    base_required <- !(meta %in% c("create_base", "list_base"))
-    table_required <- meta %in%
-      c("update_table", "update_field", "create_field")
-    column_required <- (meta == "update_field")
-  } else {
-    # For a custom template, resolve any ID that the template uses
-    base_required <- grepl("{base}", template, fixed = TRUE)
-    table_required <- grepl("{table}", template, fixed = TRUE)
-    column_required <- grepl("{column}", template, fixed = TRUE)
-  }
-
-  template <- template %||%
-    paste0(
+    template <- paste0(
       "meta/bases",
       switch(
         meta,
@@ -103,6 +87,12 @@ request_airtable_meta <- function(
         "update_field" = "/{base}/tables/{table}/fields/{column}"
       )
     )
+  }
+
+  # Require the base, table, and column IDs used by the template
+  base_required <- grepl("{base}", template, fixed = TRUE)
+  table_required <- grepl("{table}", template, fixed = TRUE)
+  column_required <- grepl("{column}", template, fixed = TRUE)
 
   if (base_required) {
     base <- get_base_id(

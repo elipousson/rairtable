@@ -6,11 +6,11 @@
 \alias{delete_comment}
 \title{List comments, create a comment, or delete a comment on an Airtable record}
 \usage{
-list_comments(airtable = NULL, record = NULL, ...)
+list_comments(airtable = NULL, record = NULL, token = NULL, ...)
 
-create_comment(airtable = NULL, record = NULL, text, ...)
+create_comment(airtable = NULL, record = NULL, text, token = NULL, ...)
 
-delete_comment(airtable = NULL, record = NULL, comment, ...)
+delete_comment(airtable = NULL, record = NULL, comment, token = NULL, ...)
 }
 \arguments{
 \item{airtable}{An airtable class object created with \code{\link[=airtable]{airtable()}} or an
@@ -23,6 +23,10 @@ Optional if base \emph{and} table are supplied.}
 \item{record}{Record ID (a string starting with "rec") or an Airtable record
 URL. If record is a URL, no additional parameters are required. Otherwise,
 airtable, url, or base and table must be supplied.}
+
+\item{token}{Airtable personal access token, Defaults to \code{NULL} which is set
+to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat]{get_airtable_pat()}}) or
+"AIRTABLE_API_KEY" (from \code{\link[=get_airtable_api_key]{get_airtable_api_key()}}).}
 
 \item{...}{Additional parameters including url or base and table values. url
 or base and table must be supplied if airtable is \code{NULL} and record is a

@@ -9,12 +9,12 @@ map_along <- function(x, .f, ..., action = NULL, format = NULL) {
     "{cli::symbol$arrow_right} {action}: {cli::pb_bar} | {cli::pb_percent}"
 
   rlang::with_options(
-    list("cli.progress_show_after" = 0.75),
     map(
       cli::cli_progress_along(x, format = format),
       .f = .f,
       ...
-    )
+    ),
+    cli.progress_show_after = 0.75
   )
 }
 

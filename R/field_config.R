@@ -281,11 +281,14 @@ get_field_config <- function(
 
   check_list(fields, call = call)
 
-  lapply(
-    fields,
-    prep_table_field,
-    linkedTableId = linkedTableId,
-    viewIdForRecordSelection = viewIdForRecordSelection
+  # prep_table_field() returns NULL for fields that can't be copied
+  vctrs::list_drop_empty(
+    lapply(
+      fields,
+      prep_table_field,
+      linkedTableId = linkedTableId,
+      viewIdForRecordSelection = viewIdForRecordSelection
+    )
   )
 }
 

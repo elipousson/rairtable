@@ -226,34 +226,7 @@ parse_url_record_id <- function(url) {
     "((?<=/){record_name}(?=/|\\?))|((?<=/){record_name}$)"
   )
 
-  vapply(
-    as.character(url),
-    function(x) string_extract(x, record_pattern) %||% NA_character_,
-    NA_character_,
-    USE.NAMES = FALSE
-  )
-}
-
-#' Parse record IDs from a vector of record or cell URLs and error if any URL
-#' does not contain a record ID
-#'
-#' @noRd
-parse_record_urls <- function(url, call = caller_env()) {
-  ids <- parse_url_record_id(url)
-
-  if (anyNA(ids)) {
-    missing <- url[is.na(ids)]
-    cli_abort(
-      c(
-        "Can't find a record ID in {length(missing)} URL{?s}.",
-        "i" = "Record IDs start with {.val rec}.",
-        "x" = "Problem URL{?s}: {.url {missing}}"
-      ),
-      call = call
-    )
-  }
-
-  ids
+  string_extract(url, record_pattern)
 }
 
 #' Parse workspace ID from URL
@@ -269,12 +242,27 @@ parse_url_workspace_id <- function(url) {
   string_extract(url, workspace_pattern)
 }
 
-#' Extract pattern from a length 1 string
+#' Extract pattern from a string or character vector
+#'
+#' Returns `NULL` if a length 1 string does not match the pattern or `NA` for
+#' any element of a longer vector that does not match.
 #'
 #' @param string Passed to x parameter of [regmatches()]
 #' @inheritParams base::regexpr
 #' @noRd
 string_extract <- function(string, pattern, perl = TRUE) {
+  if (length(string) > 1) {
+    # Unmatched elements are NA to keep the result aligned with string
+    return(
+      vapply(
+        string,
+        function(x) string_extract(x, pattern, perl) %||% NA_character_,
+        NA_character_,
+        USE.NAMES = FALSE
+      )
+    )
+  }
+
   if (is.na(string)) {
     return(NA_character_)
   }

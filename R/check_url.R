@@ -80,9 +80,6 @@ check_airtable_url <- function(
 #' @param require_view If `TRUE`, the string "viw" must be included in the
 #'   string supplied to url. If `FALSE` (default), there is no check
 #'   for a view being present in the API request URL.
-#' @param require_view If `TRUE`, the string "viw" must be included in the
-#'   string supplied to url. If `FALSE` (default), there is no check
-#'   for a view being present in the API request URL.
 #' @keywords internal
 check_airtable_api_url <- function(
   url,
@@ -147,7 +144,7 @@ set_missing_url_message <- function(
     missing <- c(missing, "a table ID starting with {.val tbl}")
   }
 
-  if (is_string(require_table) && !grepl(require_table, url)) {
+  if (is_string(require_table) && !has_table_name(url, require_table)) {
     missing <- c(missing, "a table named {.val {require_table}}")
   }
 
@@ -156,6 +153,19 @@ set_missing_url_message <- function(
   }
 
   missing
+}
+
+#' Does the url include the table name (raw or percent-encoded)?
+#'
+#' @noRd
+has_table_name <- function(url, table_name) {
+  any(
+    vapply(
+      c(table_name, encode_url_path(table_name)),
+      function(x) grepl(x, url, fixed = TRUE),
+      TRUE
+    )
+  )
 }
 
 #' Does the parsed values from a URL included required IDs?

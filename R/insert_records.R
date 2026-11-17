@@ -12,8 +12,9 @@
 #' @inheritParams return_data_resp
 #' @param batch_size Deprecated. Set using the `rairtable.batch_size` option.
 #' @return A data frame (invisibly) of the input data, to be stored as an object
-#'   or piped into additional functions or, if as_json is `TRUE`, the function
-#'   returns the parsed API response from [httr2::resp_body_json()].
+#'   or piped into additional functions or, if return_data is `FALSE`, the
+#'   function returns the parsed API response from
+#'   [httr2::resp_body_json()].
 #'
 #' @export
 insert_records <- function(
@@ -24,10 +25,18 @@ insert_records <- function(
   return_data = TRUE,
   ...
 ) {
+  if (lifecycle::is_present(batch_size)) {
+    lifecycle::deprecate_warn(
+      when = "0.2.0",
+      what = "insert_records(batch_size)",
+      details = "Set the batch size with the `rairtable.batch_size` option."
+    )
+  }
+
   # TODO: Add support for inserting records from a list
   check_data_frame(data)
 
-  if (is_empty(data)) {
+  if (nrow(data) == 0 || ncol(data) == 0) {
     cli_abort("{.arg data} can't be an empty data frame.")
   }
 

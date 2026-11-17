@@ -57,7 +57,7 @@ update_records <- function(
       getOption("rairtable.id_col", "airtable_record_id")
     records <- get_record_id_col(data = data, id_col = airtable_id_col)
   } else if (all(is_url(records))) {
-    records <- parse_record_urls(records)
+    records <- get_record_ids_from_urls(records)
   }
 
   check_character(records)
@@ -65,11 +65,18 @@ update_records <- function(
 
   update_data <- get_data_columns(
     data = data,
-    columns = columns,
+    columns = {{ columns }},
     id_col = airtable_id_col
   )
 
-  update_fields <- get_data_colnames(columns, .data = update_data)
+  if (nrow(update_data) != n_records) {
+    cli_abort(
+      "{.arg data} has {nrow(update_data)} row{?s} but
+      {n_records} record ID{?s} {?was/were} found."
+    )
+  }
+
+  update_fields <- names(update_data)
 
   if (!is_null(model)) {
     update_fields <- try_fetch(
@@ -171,6 +178,14 @@ req_update_records <- function(
 
   data <- make_list_of_lists(data, call = call)
 
+  if (length(data) != n_records) {
+    cli_abort(
+      "{.arg data} must have one row for each of the {n_records} record ID{?s},
+      not {length(data)}.",
+      call = call
+    )
+  }
+
   if (n_records > batch_size) {
     batched_records <- split_list(records, batch_size, call = call)
 
@@ -197,7 +212,13 @@ req_update_records <- function(
   req <- httr2::req_body_json(
     req,
     data = list(
-      "fields" = make_list_of_lists(data, 1, call = call),
+      "records" = unname(
+        Map(
+          function(id, fields) list("id" = id, "fields" = fields),
+          records,
+          data
+        )
+      ),
       "returnFieldsByFieldId" = fields_by_id,
       "typecast" = typecast
     )
@@ -215,7 +236,7 @@ req_update_record <- function(
   ...,
   record,
   data,
-  typecast = TRUE,
+  typecast = FALSE,
   method = NULL,
   token = NULL,
   call = caller_env()
@@ -255,21 +276,21 @@ get_record_id_col <- function(
   data,
   id_col = NULL,
   id_col_arg = caller_arg(id_col),
-  id_from_col = TRUE,
   call = caller_env()
 ) {
   check_data_frame(data, call = call)
 
-  if (!id_from_col && tibble::has_rownames(data)) {
-    return(row.names(data))
-  }
-
   id_col <- id_col %||%
     getOption("rairtable.id_col", "airtable_record_id")
 
-  if (is_string(id_col) && (id_col != "")) {
-    check_data_frame(data, call = call)
+  has_id_col <- is_string(id_col) && (id_col != "") && has_name(data, id_col)
 
+  # Data read with id_to_col = FALSE has record IDs as rownames
+  if (!has_id_col && tibble::has_rownames(data)) {
+    return(row.names(data))
+  }
+
+  if (is_string(id_col) && (id_col != "")) {
     if (is_empty(data)) {
       cli_abort(
         "{.arg data} can't be empty.",
@@ -326,14 +347,14 @@ get_data_columns <- function(
     data <- data[, names(data) != id_col, drop = FALSE]
   }
 
-  select_cols(columns, .data = data, error_call = call)
-}
+  pos <- tidyselect::eval_select(
+    enquo(columns),
+    data = data,
+    allow_rename = FALSE,
+    error_call = call
+  )
 
-#' Get names of selected columns
-#'
-#' @noRd
-get_data_colnames <- function(..., .data, call = caller_env()) {
-  names(select_cols(..., .data = .data, error_call = call))
+  data[pos]
 }
 
 #' Use tidyselect to pull a column from a data frame

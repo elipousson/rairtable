@@ -50,10 +50,9 @@ validate field names in \code{data}.}
 field IDs instead of field names. The response is only returned if
 \code{return_data = FALSE}.}
 
-\item{typecast}{If \code{TRUE} (default), values will be converted to match the
-base if possible. typecase must be set to \code{TRUE} to add new values to a
-multiselect field type.
-base. Required.}
+\item{typecast}{If \code{TRUE}, values will be converted to match the base if
+possible. typecast must be set to \code{TRUE} to add new values to a
+multiselect field type. Defaults to \code{FALSE}.}
 
 \item{return_data}{If \code{FALSE}, return JSON response from the Airtable web API
 as a list. If \code{TRUE} (default) and data is not \code{NULL}, return input data

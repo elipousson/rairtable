@@ -14,6 +14,7 @@ airtable(
   api_url = NULL,
   api_version = deprecated(),
   token = NULL,
+  require_table = TRUE,
   base_name = NULL,
   lookup = FALSE,
   ...
@@ -50,6 +51,12 @@ default api_url.}
 \item{token}{Airtable personal access token, Defaults to \code{NULL} which is set
 to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat]{get_airtable_pat()}}) or
 "AIRTABLE_API_KEY" (from \code{\link[=get_airtable_api_key]{get_airtable_api_key()}}).}
+
+\item{require_table}{If \code{TRUE} (default), the table must be supplied (as a
+table ID, name, or part of a URL). If \code{FALSE}, \code{table} can be an Airtable
+base URL (without a table) to create an \code{airtable} object that identifies
+only a base, which can be used with functions such as \code{\link[=create_table]{create_table()}} that
+only need a base.}
 
 \item{base_name}{Airtable base name. Optional and only used for printing.
 Stored separately from \code{description}.}

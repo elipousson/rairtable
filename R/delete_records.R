@@ -39,6 +39,14 @@ delete_records <- function(
   token = NULL,
   ...
 ) {
+  if (lifecycle::is_present(batch_size)) {
+    lifecycle::deprecate_warn(
+      when = "0.2.0",
+      what = "delete_records(batch_size)",
+      details = "Set the batch size with the `rairtable.batch_size` option."
+    )
+  }
+
   if (is_null(data) && is_null(records)) {
     cli_abort(
       "{.arg data} or {.arg records} must be supplied."
@@ -65,7 +73,7 @@ delete_records <- function(
       )
     }
   } else if (all(is_url(records))) {
-    records <- parse_record_urls(records)
+    records <- get_record_ids_from_urls(records)
   }
 
   check_character(records)

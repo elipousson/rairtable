@@ -30,7 +30,9 @@ test_that("as_airtable converts Airtable and API URLs without a request", {
 test_that("as_airtable rejects table names, lookalike hosts, and other types", {
   expect_error(as_airtable("Table 1"), "must be an")
   expect_error(
-    as_airtable("https://airtable.com.example.org/appABCDEFGHIJKLMN/tblABCDEFGHIJKLMN"),
+    as_airtable(
+      "https://airtable.com.example.org/appABCDEFGHIJKLMN/tblABCDEFGHIJKLMN"
+    ),
     "must be an"
   )
   expect_error(as_airtable(1L), "must be an")

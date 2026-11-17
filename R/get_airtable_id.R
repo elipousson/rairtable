@@ -1,13 +1,12 @@
 #' Is x an Airtable ID?
 #'
-#' Airtable IDs are a three letter prefix followed by an alphanumeric string
-#' (14 characters for current IDs). Requiring at least 10 characters after the
-#' prefix avoids treating ordinary words that start with the prefix (e.g.
-#' "application" or "recommended") as IDs.
+#' Airtable IDs are a three letter prefix followed by an alphanumeric string.
+#' This only checks the prefix, not the length, so short placeholder IDs work in
+#' examples and tests.
 #'
 #' @param x Object to test.
 #' @noRd
-is_rairtable_id <- function(x, pattern, start = "^", end = "[[:alnum:]]{10,}$") {
+is_rairtable_id <- function(x, pattern, start = "^", end = "[[:alnum:]]+") {
   if (is_null(x) || !is_string(x)) {
     return(FALSE)
   }
@@ -35,7 +34,7 @@ is_base_id <- function(x) {
 is_table_id <- function(x, table_name = NULL) {
   # FIXME: table_name is not exposed so there is no option to pass a table
   # name to is_table_id from get_table_id
-  table_name <- table_name %||% "^tbl[[:alnum:]]{10,}$"
+  table_name <- table_name %||% "^tbl[[:alnum:]]+$"
   is_rairtable_id(x, table_name, "", "")
 }
 
@@ -192,6 +191,26 @@ get_record_id <- function(record = NULL, url = NULL, ..., call = caller_env()) {
     with a record ID, not {.obj_type_friendly {record}}.",
     call = call
   )
+}
+
+#' Get Airtable record IDs from a vector of record URLs
+#'
+#' @noRd
+get_record_ids_from_urls <- function(
+  url,
+  arg = caller_arg(url),
+  call = caller_env()
+) {
+  ids <- parse_url_record_id(url)
+
+  if (is_null(ids) || anyNA(ids)) {
+    cli_abort(
+      "{.arg {arg}} must be record IDs or URLs with a record ID.",
+      call = call
+    )
+  }
+
+  ids
 }
 
 #' Get an Airtable workspace ID from a string or URL

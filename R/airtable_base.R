@@ -16,7 +16,12 @@
 #' - For [get_table_model()], additional parameters can include airtable or url
 #' (one of which is required if table is `NULL`).
 #' @returns
-#'  - [airtable_base()] returns an `airtable_base_schema` object.
+#'  - [airtable_base()] returns a list with the base ID ("base"), the base name
+#'  ("base_name"), an `airtable_base_schema` object ("schema"), and a named list
+#'  of `airtable` objects for each table in the base ("tables"). The description
+#'  of each `airtable` object is the description of the table in Airtable and
+#'  is blank if the table has no description. The base name is stored
+#'  separately as `base_name`.
 #'  - [get_base_schema()] returns the response from the Airtable get base schema
 #'  API method
 #'  - [get_table_models()] returns a tibble with the list of tables
@@ -28,8 +33,8 @@
 #' \dontrun{
 #' base <- airtable_base("appXXXXXXXXXXXXX")
 #'
-#' # read 'table1' from the base
-#' tbl_data <- read_airtable(base$table1)
+#' # read 'Table 1' from the base
+#' tbl_data <- read_airtable(base$tables[["Table 1"]])
 #'
 #' # view base schema
 #' print(base$schema)
@@ -46,8 +51,8 @@ airtable_base <- function(base = NULL, token = NULL, ...) {
     simplifyVector = FALSE
   )
 
-  # The schema response does not include the base name so look it up once for
-  # all tables
+  # The schema response does not include the base name so look it up once and
+  # pass it to every table (the base name is not used as a table description)
   base_info <- list_bases(bases = base, token = token)
   base_name <- base_info[["name"]]
 
@@ -74,19 +79,22 @@ airtable_base <- function(base = NULL, token = NULL, ...) {
     "base" = base,
     "base_name" = base_name,
     "schema" = base_schema,
-    "tables" = map(
-      base_schema,
-      function(tbl) {
-        airtable(
-          table = tbl[["id"]],
-          name = tbl[["name"]],
-          description = tbl[["description"]],
-          fields = as.list(names(tbl[["fields"]])),
-          base = base,
-          base_name = base_name,
-          token = token
-        )
-      }
+    "tables" = set_names(
+      map(
+        base_schema,
+        function(tbl) {
+          airtable(
+            table = tbl[["id"]],
+            name = tbl[["name"]],
+            description = tbl[["description"]],
+            fields = as.list(names(tbl[["fields"]])),
+            base = base,
+            base_name = base_name,
+            token = token
+          )
+        }
+      ),
+      names_at(base_schema, "name")
     )
   )
 }
@@ -220,11 +228,6 @@ is_airtable_table_schema <- function(x) {
 }
 
 #' @export
-format.airtable_base_schema <- function(x, ...) {
-  formatC(vctrs::vec_data(x))
-}
-
-#' @export
 vec_ptype_abbr.airtable_base_schema <- function(x, ...) {
   "atbl_app"
 }
@@ -236,30 +239,27 @@ vec_ptype_full.airtable_base_schema <- function(x, ...) {
 
 #' @export
 print.airtable_base_schema <- function(x, ...) {
-  cli::cli_text("{.cls {class(x)}}")
+  cli::cli_text("{.cls {class(x)[[1]]}}")
 
   n_tbls <- length(x)
   cli::cli_text("{cli::symbol$line} {n_tbls} table{?s}:")
 
+  # Table names and IDs are substituted by cli rather than pasted into the
+  # message so braces in a name are not evaluated
+  tbl_names <- names_at(x, "name")
+  tbl_ids <- names_at(x, "id")
+
   cli::cli_bullets(
     set_names(
-      paste0(
-        "{.value ",
-        names_at(x, "name"),
-        "} - {.field ",
-        names_at(x, "id"),
-        "}"
+      sprintf(
+        "{.val {tbl_names[[%1$d]]}} - {.field {tbl_ids[[%1$d]]}}",
+        seq_len(n_tbls)
       ),
       rep_len("*", n_tbls)
     )
   )
 
   invisible(x)
-}
-
-#' @export
-format.airtable_table_schema <- function(x, ...) {
-  formatC(vctrs::vec_data(x))
 }
 
 #' @export
@@ -275,7 +275,7 @@ vec_ptype_full.airtable_table_schema <- function(x, ...) {
 
 #' @export
 print.airtable_table_schema <- function(x, ...) {
-  cli::cli_text("{.cls {class(x)}}")
+  cli::cli_text("{.cls {class(x)[[1]]}}")
 
   fields <- cli::cli_vec(
     names_at(x$fields),
@@ -294,11 +294,6 @@ print.airtable_table_schema <- function(x, ...) {
 }
 
 #' @export
-format.airtable_fields_schema <- function(x, ...) {
-  formatC(vctrs::vec_data(x))
-}
-
-#' @export
 vec_ptype_abbr.airtable_fields_schema <- function(x, ...) {
   "atbl_fld"
 }
@@ -310,18 +305,19 @@ vec_ptype_full.airtable_fields_schema <- function(x, ...) {
 
 #' @export
 print.airtable_fields_schema <- function(x, ...) {
-  cli::cli_text("{.cls {class(x)}}")
+  cli::cli_text("{.cls {class(x)[[1]]}}")
 
   n_fields <- length(x)
   cli::cli_text("{cli::symbol$line} {n_fields} field{?s}:")
+
+  fld_names <- names_at(x, "name")
+  fld_types <- names_at(x, "type")
+
   cli::cli_bullets(
     set_names(
-      paste0(
-        "{.field ",
-        names_at(x, "name"),
-        "} - {.code ",
-        names_at(x, "type"),
-        "}"
+      sprintf(
+        "{.field {fld_names[[%1$d]]}} - {.code {fld_types[[%1$d]]}}",
+        seq_len(n_fields)
       ),
       rep_len("*", n_fields)
     )

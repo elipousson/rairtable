@@ -90,10 +90,8 @@ to match the order of the table model.}
 to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat]{get_airtable_pat()}}) or
 "AIRTABLE_API_KEY" (from \code{\link[=get_airtable_api_key]{get_airtable_api_key()}}).}
 
-\item{...}{For \code{\link[=read_airtable]{read_airtable()}}, additional query parameters, such as url,
-can be passed to \code{\link[=req_airtable]{req_airtable()}}. For \code{\link[=list_records]{list_records()}} and \code{\link[=get_record]{get_record()}},
-additional parameters are passed to \code{\link[=request_airtable]{request_airtable()}} and can also
-include base and table.}
+\item{...}{Additional parameters passed to \code{\link[=request_airtable]{request_airtable()}}, such as url
+or base and table, to identify the table to read if airtable is \code{NULL}.}
 
 \item{view}{Airtable view ID. View ID values starts with "viw". Optional if
 require_view is \code{FALSE}.}
@@ -122,7 +120,8 @@ the displayed character string.}
 "string", tz defaults to \code{Sys.timezone()} and locale defaults to
 \code{Sys.getlocale("LC_TIME")}.}
 
-\item{max_records}{Maximum number of records to return. Must be 100 or less.}
+\item{max_records}{Maximum number of records to return. Defaults to \code{NULL}
+which returns all records.}
 
 \item{page_size}{Maximum number of records to return per page.}
 

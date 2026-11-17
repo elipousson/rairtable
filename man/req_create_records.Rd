@@ -9,7 +9,7 @@ req_create_records(
   ...,
   data,
   fields_by_id = FALSE,
-  typecast = TRUE,
+  typecast = FALSE,
   token = NULL,
   call = caller_env()
 )
@@ -71,10 +71,9 @@ Airtable base. Required.}
 field IDs instead of field names. This response is only returned if
 \code{return_data = FALSE}.}
 
-\item{typecast}{If \code{TRUE} (default), values will be converted to match the
-base if possible. typecase must be set to \code{TRUE} to add new values to a
-multiselect field type.
-base. Required.}
+\item{typecast}{If \code{TRUE}, values will be converted to match the base if
+possible. typecast must be set to \code{TRUE} to add new values to a
+multiselect field type. Defaults to \code{FALSE}.}
 
 \item{token}{Airtable personal access token, Defaults to \code{NULL} which is set
 to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat]{get_airtable_pat()}}) or

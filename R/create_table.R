@@ -59,12 +59,14 @@ create_table <- function(
   token = NULL,
   ...
 ) {
-  if (is_null(config)) {
-    config <- make_table_config(
-      name = name,
-      description = description,
-      fields = fields
-    )
+  if (!is_null(config)) {
+    if (!is_null(model)) {
+      cli_alert_warning(
+        "{.arg model} is ignored if {.arg config} is supplied."
+      )
+    }
+
+    check_table_config(config)
   } else if (!is_null(model)) {
     config <- copy_table_config(
       model = model,
@@ -72,7 +74,11 @@ create_table <- function(
       description = description
     )
   } else {
-    check_table_config(config)
+    config <- make_table_config(
+      name = name,
+      description = description,
+      fields = fields
+    )
   }
 
   base <- get_base_id(
@@ -102,7 +108,7 @@ create_table <- function(
 
   body <- httr2::resp_body_json(resp)
 
-  table_url <- paste0(
+  table_url <- paste(
     getOption("rairtable.base_url", "https://airtable.com"),
     base,
     body[["id"]],
@@ -161,7 +167,7 @@ update_table <- function(
     )
   }
 
-  table_url <- paste0(
+  table_url <- paste(
     getOption("rairtable.base_url", "https://airtable.com"),
     parse_url_base_id(resp[["url"]]),
     parse_url_table_id(resp[["url"]]),

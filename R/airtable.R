@@ -10,6 +10,11 @@
 #'   names "id", "name", and "description", the value for id is used as the
 #'   value of table and name and description are passed to the respective
 #'   parameters.
+#' @param require_table If `TRUE` (default), the table must be supplied (as a
+#'   table ID, name, or part of a URL). If `FALSE`, `table` can be an Airtable
+#'   base URL (without a table) to create an `airtable` object that identifies
+#'   only a base, which can be used with functions such as [create_table()] that
+#'   only need a base.
 #' @param base Airtable base ID. Base ID values start with "app". Optional if
 #'   table is a URL containing a base ID or required otherwise.
 #' @param view Optional Airtable view ID. View ID values starts with "viw".
@@ -57,10 +62,19 @@ airtable <- function(
   api_url = NULL,
   api_version = deprecated(),
   token = NULL,
+  require_table = TRUE,
   base_name = NULL,
   lookup = FALSE,
   ...
 ) {
+  if (lifecycle::is_present(api_version)) {
+    lifecycle::deprecate_warn(
+      when = "0.2.0",
+      what = "airtable(api_version)",
+      details = "The API version is now part of the default `api_url`."
+    )
+  }
+
   atbl <- new_airtable_obj(
     base = base,
     table = table,
@@ -71,7 +85,8 @@ airtable <- function(
     base_name = base_name,
     lookup = lookup,
     api_url = api_url,
-    token = token
+    token = token,
+    require_table = require_table
   )
 
   # A table name (unlike a table ID) does not start with "tbl" so only require
@@ -169,6 +184,7 @@ new_airtable_obj <- function(
   base_name = NULL,
   lookup = FALSE,
   token = NULL,
+  require_table = TRUE,
   call = caller_env()
 ) {
   if (is_list(table)) {
@@ -182,7 +198,7 @@ new_airtable_obj <- function(
   if (is_airtable_url(table)) {
     ids <- parse_airtable_url(
       table,
-      require_table = TRUE,
+      require_table = require_table,
       require_view = FALSE,
       call = call
     )
@@ -202,17 +218,19 @@ new_airtable_obj <- function(
     base_name <- base_name %||% base_info[["name"]]
     permissions <- base_info[["permissionLevel"]] %||% list()
 
-    model <- lookup_table_model(base, table, token = token, call = call)
+    if (!is_null(table)) {
+      model <- lookup_table_model(base, table, token = token, call = call)
 
-    # Resolve a table name to the table ID
-    table <- model[["id"]]
-    name <- name %||% model[["name"]]
-    description <- description %||% model[["description"]]
+      # Resolve a table name to the table ID
+      table <- model[["id"]]
+      name <- name %||% model[["name"]]
+      description <- description %||% model[["description"]]
 
-    if (is_empty(fields)) {
-      fields <- as.list(
-        vapply(model[["fields"]], function(x) x[["name"]], character(1))
-      )
+      if (is_empty(fields)) {
+        fields <- as.list(
+          vapply(model[["fields"]], function(x) x[["name"]], character(1))
+        )
+      }
     }
   }
 
@@ -257,12 +275,6 @@ new_airtable_obj <- function(
 }
 
 #' @export
-#' @importFrom vctrs vec_data
-format.airtable <- function(x, ...) {
-  formatC(vctrs::vec_data(x))
-}
-
-#' @export
 vec_ptype_abbr.airtable <- function(x, ...) {
   "atbl"
 }
@@ -275,7 +287,7 @@ vec_ptype_full.airtable <- function(x, ...) {
 #' @export
 #' @importFrom cli cli_text cli_rule cli_bullets
 print.airtable <- function(x, ...) {
-  cli::cli_text("{.cls {class(x)}}")
+  cli::cli_text("{.cls {class(x)[[1]]}}")
 
   rule_msg <- ""
 

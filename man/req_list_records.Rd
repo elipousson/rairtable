@@ -61,7 +61,8 @@ Options including "id", "createdTime", and "commentCount". Defaults to
 \code{c("id", "createdTime")}. If metadata is \code{NULL}, no additional fields are
 added to the returned data frame.}
 
-\item{max_records}{Maximum number of records to return. Must be 100 or less.}
+\item{max_records}{Maximum number of records to return. Defaults to \code{NULL}
+which returns all records.}
 
 \item{page_size}{Maximum number of records to return per page.}
 }

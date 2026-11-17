@@ -96,7 +96,10 @@ mock_lookup <- function(models, env = parent.frame()) {
       )
     },
     get_table_models = function(base, tables, ...) {
-      Filter(function(x) x[["name"]] %in% tables || x[["id"]] %in% tables, models)
+      Filter(
+        function(x) x[["name"]] %in% tables || x[["id"]] %in% tables,
+        models
+      )
     },
     .env = env
   )
@@ -173,4 +176,17 @@ test_that("airtable lookup = TRUE errors if the table is not in the base", {
     airtable("Missing", "appABCDEFGHIJKLMN", lookup = TRUE),
     "Can't find a table matching"
   )
+})
+
+test_that("airtable lookup with a base-only object does not look up a table", {
+  mock_lookup(lookup_models)
+
+  atbl <- airtable(
+    "https://airtable.com/appABCDEFGHIJKLMN",
+    require_table = FALSE,
+    lookup = TRUE
+  )
+
+  expect_null(atbl[["table"]])
+  expect_identical(atbl[["base_name"]], "Test base")
 })

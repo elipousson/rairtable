@@ -4,6 +4,7 @@
 #' existing comment on an Airtable record.
 #'
 #' @inheritParams request_airtable
+#' @inheritParams req_auth_airtable
 #' @param record Record ID (a string starting with "rec") or an Airtable record
 #'   URL. If record is a URL, no additional parameters are required. Otherwise,
 #'   airtable, url, or base and table must be supplied.
@@ -17,10 +18,11 @@
 #' and author information.
 #' - [delete_comment()] returns a list with a comment ID..
 #' @export
-list_comments <- function(airtable = NULL, record = NULL, ...) {
+list_comments <- function(airtable = NULL, record = NULL, token = NULL, ...) {
   req <- req_comments(
     airtable = airtable,
     record = record,
+    token = token,
     ...,
     template = "{base}/{table}/{record}/comments"
   )
@@ -30,7 +32,6 @@ list_comments <- function(airtable = NULL, record = NULL, ...) {
   comments <- body[["comments"]]
   offset <- body[["offset"]]
 
-  # pre-allocate space for data
   while (!is_null(body[["offset"]])) {
     req <- httr2::req_url_query(
       .req = req,
@@ -43,7 +44,7 @@ list_comments <- function(airtable = NULL, record = NULL, ...) {
     offset <- body[["offset"]]
   }
 
-  list_rbind(comments)
+  comments_to_tibble(comments)
 }
 
 #' @rdname list_comments
@@ -51,12 +52,19 @@ list_comments <- function(airtable = NULL, record = NULL, ...) {
 #' @param text String with text of comment to create. Required for
 #'   [create_comment()].
 #' @export
-create_comment <- function(airtable = NULL, record = NULL, text, ...) {
+create_comment <- function(
+  airtable = NULL,
+  record = NULL,
+  text,
+  token = NULL,
+  ...
+) {
   check_string(text)
 
   req <- req_comments(
     airtable = airtable,
     record = record,
+    token = token,
     ...,
     template = "{base}/{table}/{record}/comments",
     data = list(
@@ -66,7 +74,7 @@ create_comment <- function(airtable = NULL, record = NULL, text, ...) {
 
   resp <- httr2::req_perform(req)
 
-  invisible(list_rbind(httr2::resp_body_json(resp)))
+  invisible(comments_to_tibble(list(httr2::resp_body_json(resp))))
 }
 
 #' @rdname list_comments
@@ -74,12 +82,19 @@ create_comment <- function(airtable = NULL, record = NULL, text, ...) {
 #' @param comment Comment ID (string starting with the text "com"). Required for
 #'   [delete_comment()].
 #' @export
-delete_comment <- function(airtable = NULL, record = NULL, comment, ...) {
+delete_comment <- function(
+  airtable = NULL,
+  record = NULL,
+  comment,
+  token = NULL,
+  ...
+) {
   check_required(comment)
 
   req <- req_comments(
     airtable = airtable,
     record = record,
+    token = token,
     ...,
     comment = comment,
     require_comment = TRUE,
@@ -104,6 +119,7 @@ req_comments <- function(
   template = NULL,
   method = NULL,
   data = NULL,
+  token = NULL,
   require_record = TRUE,
   require_comment = FALSE,
   call = caller_env()
@@ -155,6 +171,31 @@ req_comments <- function(
     require_table = FALSE,
     method = method,
     data = data,
+    token = token,
     call = call
   )
+}
+
+#' Combine a list of comments into a tibble with one row for each comment
+#'
+#' The author of each comment is kept as a list column.
+#'
+#' @noRd
+#' @importFrom tibble as_tibble
+comments_to_tibble <- function(comments) {
+  if (is_empty(comments)) {
+    return(tibble::as_tibble(data.frame()))
+  }
+
+  rows <- lapply(
+    comments,
+    function(comment) {
+      comment <- vctrs::list_drop_empty(comment)
+      tibble::as_tibble(
+        lapply(comment, function(x) if (is.list(x)) list(x) else x)
+      )
+    }
+  )
+
+  tibble::as_tibble(list_rbind(rows))
 }

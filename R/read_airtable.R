@@ -34,10 +34,8 @@
 #' @param max_rows Deprecated. Maximum number of rows to read.
 #' @param simplifyVector Passed to [httr2::req_body_json()]. If `FALSE`,
 #'   [get_record()] and [list_records()] both return named lists of records.
-#' @param ... For [read_airtable()], additional query parameters, such as url,
-#'   can be passed to [req_airtable()]. For [list_records()] and [get_record()],
-#'   additional parameters are passed to [request_airtable()] and can also
-#'   include base and table.
+#' @param ... Additional parameters passed to [request_airtable()], such as url
+#'   or base and table, to identify the table to read if airtable is `NULL`.
 #' @inheritParams rlang::args_error_context
 #'
 #' @return A data frame with the records from the Airtable base and table
@@ -62,6 +60,14 @@ read_airtable <- function(
   token = NULL,
   ...
 ) {
+  if (lifecycle::is_present(max_rows)) {
+    lifecycle::deprecate_warn(
+      when = "0.2.0",
+      what = "read_airtable(max_rows)",
+      details = "Use `list_records(max_records)` to limit the number of records."
+    )
+  }
+
   req <- req_airtable(
     .req = request_airtable(
       airtable = airtable,
@@ -276,7 +282,8 @@ get_record <- function(
 #'   Options including "id", "createdTime", and "commentCount". Defaults to
 #'   `c("id", "createdTime")`. If metadata is `NULL`, no additional fields are
 #'   added to the returned data frame.
-#' @param max_records Maximum number of records to return. Must be 100 or less.
+#' @param max_records Maximum number of records to return. Defaults to `NULL`
+#'   which returns all records.
 #' @param page_size Maximum number of records to return per page.
 #' @keywords internal
 #' @importFrom httr2 req_url_query
@@ -314,6 +321,7 @@ req_list_records <- function(
       req,
       sort = sort,
       direction = direction,
+      model = model,
       call = call
     )
   }
@@ -381,7 +389,6 @@ req_records_fields <- function(req, fields, model = NULL, call = caller_env()) {
     )
   }
 
-  req <- req_remove_airtable_view(req, remove_view = TRUE)
   fields <- set_names(fields, "fields[]")
   rlang::exec(httr2::req_url_query, req, !!!fields)
 }
@@ -591,6 +598,16 @@ resp_body_records <- function(
     # Used by read_airtable and list_records
     records <- body[["records"]]
     fields <- records[["fields"]]
+
+    if (is_empty(records)) {
+      # An empty table or filter result is returned as an empty array which
+      # is simplified to an unnamed list
+      records <- data.frame(
+        "id" = character(),
+        "createdTime" = character()
+      )
+      fields <- data.frame()
+    }
   } else if (has_name(body, c("fields"))) {
     # Used by get_record
     fields <- body[["fields"]]

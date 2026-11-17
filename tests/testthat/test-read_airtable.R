@@ -1,6 +1,5 @@
 httptest2::with_mock_dir("read_airtable", {
   test_that("read_airtable works", {
-
     atbl <- get_rairtable_test_obj()
 
     expect_error(
