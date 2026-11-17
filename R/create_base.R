@@ -12,6 +12,10 @@
 #' @param schema Optional if `tables` is supplied. A list with a named
 #' `"tables"` element. Typically, expected to be the output from the
 #' [get_base_schema()] funtion.
+#' @section Deleting bases and tables:
+#' The Airtable Web API has no endpoint to delete a base or a table. To clean
+#' up, use [delete_records()] to remove records or delete the base or table in
+#' the Airtable user interface.
 #' @inheritParams request_airtable_meta
 #' @inheritParams httr2::resp_body_json
 #' @seealso

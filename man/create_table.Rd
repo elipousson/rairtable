@@ -65,6 +65,13 @@ API: \url{https://airtable.com/developers/web/api/update-table} Find more
 information about the table config for the Airtable API:
 \url{https://airtable.com/developers/web/api/model/table-model}
 }
+\section{Deleting tables}{
+
+The Airtable Web API has no endpoint to delete a table (or a base). To clean
+up, use \code{\link[=delete_records]{delete_records()}} to remove records or delete the table in the
+Airtable user interface.
+}
+
 \examples{
 \dontrun{
 if (interactive()) {

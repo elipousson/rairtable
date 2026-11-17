@@ -42,6 +42,13 @@ Use the Airtable Metadata API to create a new Airtable bases. If schema is
 provided and tables is \code{NULL}, tables is copied based on the models from an
 existing base schema.
 }
+\section{Deleting bases and tables}{
+
+The Airtable Web API has no endpoint to delete a base or a table. To clean
+up, use \code{\link[=delete_records]{delete_records()}} to remove records or delete the base or table in
+the Airtable user interface.
+}
+
 \seealso{
 \itemize{
 \item \code{\link[=get_base_schema]{get_base_schema()}}

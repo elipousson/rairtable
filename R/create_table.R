@@ -10,6 +10,11 @@
 #' information about the table config for the Airtable API:
 #' <https://airtable.com/developers/web/api/model/table-model>
 #'
+#' @section Deleting tables:
+#' The Airtable Web API has no endpoint to delete a table (or a base). To clean
+#' up, use [delete_records()] to remove records or delete the table in the
+#' Airtable user interface.
+#'
 #' @name create_table
 #' @param config A table model with a name, description, and field array from
 #'   [make_table_config()].
