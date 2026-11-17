@@ -167,12 +167,14 @@ make_field_array <- function(
 ) {
   field_array <- try_fetch(
     lapply(
-      X = make_list_of_lists(
+      # Names must be dropped so the array is serialized as a JSON array and
+      # not an object
+      X = unname(make_list_of_lists(
         fields,
         cols = c("type", "name", "description", "options"),
         arg = arg,
         call = call
-      ),
+      )),
       FUN = make_field_config,
       error_arg = "field",
       call = call
@@ -402,4 +404,105 @@ prep_table_field <- function(
       options = fld_options
     )
   )
+}
+
+#' Make a field config list from a data frame
+#'
+#' [data_as_fields()] maps the class of each column in a data frame to an
+#' Airtable field type and returns an unnamed list of field configs suitable
+#' for the `fields` parameter of [make_table_config()] or [create_table()].
+#'
+#' The mapping is:
+#'
+#' - factor: "singleSelect" with choices from the factor levels
+#' - integer: "number" with precision 0
+#' - other numeric: "number" with precision 8
+#' - logical: "checkbox"
+#' - Date: "date" with the ISO date format
+#' - POSIXct: "dateTime" with ISO date format, 24 hour time, and UTC time zone
+#' - character: "multilineText" if any value is longer than `long_text`
+#'   characters, otherwise "singleLineText"
+#' - any other class: "singleLineText" (with a warning)
+#'
+#' The first field in an Airtable table is the primary field. A warning is
+#' issued if the first column is not mapped to a text field type.
+#'
+#' @param data A data frame with at least one column.
+#' @param long_text Character columns with values longer than this many
+#'   characters are converted to "multilineText".
+#' @inheritParams rlang::args_error_context
+#' @return An unnamed list of field config lists.
+#' @seealso [make_table_config()]
+#' @export
+data_as_fields <- function(data, long_text = 100, call = caller_env()) {
+  check_data_frame(data, call = call)
+
+  if (ncol(data) == 0) {
+    cli_abort("{.arg data} must have at least one column.", call = call)
+  }
+
+  nm <- names(data)
+
+  fields <- unname(Map(
+    function(x, name) data_col_as_field(x, name, long_text, call = call),
+    data,
+    nm
+  ))
+
+  if (!(fields[[1]][["type"]] %in% c("singleLineText", "multilineText"))) {
+    cli::cli_warn(
+      c(
+        "The first column {.val {nm[[1]]}} is converted to a
+        {.val {fields[[1]][['type']]}} field.",
+        "i" = "The first field in an Airtable table is its primary field and
+        should be a text field."
+      ),
+      call = call
+    )
+  }
+
+  fields
+}
+
+#' @noRd
+data_col_as_field <- function(x, name, long_text = 100, call = caller_env()) {
+  field <- list(name = name)
+
+  if (is.factor(x)) {
+    field$type <- "singleSelect"
+    field$options <- list(
+      choices = lapply(levels(x), function(level) list(name = level))
+    )
+  } else if (is.logical(x)) {
+    field$type <- "checkbox"
+    field$options <- list(icon = "check", color = "greenBright")
+  } else if (inherits(x, "Date")) {
+    field$type <- "date"
+    field$options <- list(dateFormat = list(name = "iso"))
+  } else if (inherits(x, "POSIXct")) {
+    field$type <- "dateTime"
+    field$options <- list(
+      dateFormat = list(name = "iso"),
+      timeFormat = list(name = "24hour"),
+      timeZone = "utc"
+    )
+  } else if (is.integer(x)) {
+    field$type <- "number"
+    field$options <- list(precision = 0)
+  } else if (is.numeric(x)) {
+    field$type <- "number"
+    field$options <- list(precision = 8)
+  } else if (is.character(x)) {
+    is_long <- any(nchar(x) > long_text, na.rm = TRUE)
+    field$type <- if (is_long) "multilineText" else "singleLineText"
+  } else {
+    cli::cli_warn(
+      "Column {.val {name}} with class {.cls {class(x)[[1]]}} is converted to
+      a {.val singleLineText} field.",
+      call = call
+    )
+    field$type <- "singleLineText"
+  }
+
+  field[c("name", "type", "options")[c("name", "type", "options") %in% names(field)]]
 }

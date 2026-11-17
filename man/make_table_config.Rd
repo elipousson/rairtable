@@ -10,6 +10,7 @@ make_table_config(
   description = NULL,
   fields = NULL,
   model = NULL,
+  data = NULL,
   ...,
   call = caller_env()
 )
@@ -35,6 +36,9 @@ config is expected to be used within the same base.}
 \item{model}{A model for an existing table to copy for a new table config. If
 name or description are supplied, any existing name or description from the
 model is ignored. model is ignored if table is supplied.}
+
+\item{data}{A data frame. If \code{fields} is \code{NULL}, fields are derived from the
+column classes in \code{data} using \code{\link[=data_as_fields]{data_as_fields()}}.}
 
 \item{...}{
   Arguments passed on to \code{\link{get_table_model}}

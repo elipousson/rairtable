@@ -66,6 +66,7 @@ reference:
       - create_table
       - create_field
       - make_table_config
+      - data_as_fields
       - make_field_config
       - field_types
       - airtable_fields_schema

@@ -11,6 +11,8 @@
 #'   config is expected to be used within the same base.
 #' @param description Table description. Optional.
 #' @param fields Field list.
+#' @param data A data frame. If `fields` is `NULL`, fields are derived from the
+#'   column classes in `data` using [data_as_fields()].
 #' @inheritParams rlang::args_error_context
 #' @export
 make_table_config <- function(
@@ -18,6 +20,7 @@ make_table_config <- function(
   description = NULL,
   fields = NULL,
   model = NULL,
+  data = NULL,
   ...,
   call = caller_env()
 ) {
@@ -41,6 +44,10 @@ make_table_config <- function(
     allow_null = TRUE,
     call = call
   )
+
+  if (is_null(fields) && !is_null(data)) {
+    fields <- data_as_fields(data, call = call)
+  }
 
   fields <- make_field_array(fields, arg = "fields", call = call)
   check_field_array(fields, call = call)
