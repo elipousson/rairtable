@@ -26,7 +26,20 @@ field_name_match <- function(
   error_arg = caller_arg(nm),
   error_call = caller_env()
 ) {
-  values <- values %||% names_at(model[["fields"]])
+  if (is_null(values) && !is_null(model)) {
+    model_fields <- model[["fields"]]
+    if (is.data.frame(model)) {
+      model_fields <- model_fields[[1]]
+    }
+    if (is.data.frame(model_fields)) {
+      values <- c(model_fields[["name"]], model_fields[["id"]])
+    } else {
+      values <- c(
+        names_at(model_fields),
+        unlist(lapply(model_fields, function(x) x[["id"]]))
+      )
+    }
+  }
 
   arg_match(
     nm,

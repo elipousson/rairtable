@@ -16,6 +16,15 @@ New functions for working with several components of the Airtable Web API:
 * Fields and field configurations: `create_field()`, `update_field()`, `get_field_config()`, and `make_field_config()`
 * Comments: `list_comments()`, `create_comment()`, `delete_comment()`
 
+* New `data_as_fields()` and `make_table_config(data =)` derive Airtable field configs from the column classes of a data frame.
+
+* `airtable(lookup = TRUE)` stores the table model, and `read_airtable()`, `list_records()`, and `get_record()` use it (or `model`, or a new `lookup` argument) to fill unchecked checkboxes and validate fields and sort.
+
+Fixes:
+
+* `make_table_config()` and `create_base()` now send `fields` as a JSON array even if a named list (e.g. from `Map()`) is supplied.
+* `read_airtable()`, `list_records()`, and `get_record()` return unchecked checkbox fields as `FALSE` instead of `NA` when a `model` is supplied.
+
 Updated functions:
 
 * `airtable()` now supports parsing Airtable URLs to derive Airtable base, table, and view ID values. Support for parsing URLs is now available for most functions in the package.

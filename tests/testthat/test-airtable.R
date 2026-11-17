@@ -190,3 +190,18 @@ test_that("airtable lookup with a base-only object does not look up a table", {
   expect_null(atbl[["table"]])
   expect_identical(atbl[["base_name"]], "Test base")
 })
+
+test_that("airtable lookup = TRUE stores the table model for reading", {
+  withr::local_envvar(AIRTABLE_PAT = "test_pat")
+  model <- list(
+    id = "tblabc123",
+    name = "T",
+    fields = list(list(name = "Done", type = "checkbox"))
+  )
+  local_mocked_bindings(
+    list_bases = function(...) list(name = "B", permissionLevel = "create"),
+    lookup_table_model = function(...) model
+  )
+  atbl <- airtable("tblabc123", "appxyz123", lookup = TRUE)
+  expect_identical(atbl[["model"]], model)
+})

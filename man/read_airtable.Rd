@@ -13,6 +13,7 @@ read_airtable(
   airtable_id_col = NULL,
   max_rows = deprecated(),
   model = NULL,
+  lookup = FALSE,
   .name_repair = "unique",
   token = NULL,
   ...
@@ -35,6 +36,7 @@ list_records(
   metadata = c("id", "createdTime"),
   offset = NULL,
   model = NULL,
+  lookup = FALSE,
   .name_repair = "unique",
   simplifyVector = TRUE,
   token = NULL,
@@ -50,6 +52,7 @@ get_record(
   locale = NULL,
   metadata = c("id", "createdTime"),
   model = NULL,
+  lookup = FALSE,
   .name_repair = "unique",
   simplifyVector = TRUE,
   token = NULL,
@@ -80,7 +83,17 @@ rownames if id_to_col is \code{FALSE}.}
 
 \item{model}{Optional. A table model from \code{\link[=get_table_model]{get_table_model()}}. If supplied,
 model is used to validate fields and sort parameters and to arrange columns
-to match the order of the table model.}
+to match the order of the table model. If the model includes fields with
+type "checkbox", unchecked values (which Airtable omits from records) are
+returned as \code{FALSE} instead of \code{NA}. If \code{model} is \code{NULL}, the model stored
+in \code{airtable} by \code{airtable(lookup = TRUE)} is used if available. Pass
+\code{model} to avoid repeated requests for the model when reading a table
+several times.}
+
+\item{lookup}{If \code{TRUE}, and no model is supplied or stored in \code{airtable},
+get the table model from the base schema with one additional API request.
+This requires a token with the "schema.bases:read" scope. Defaults to
+\code{FALSE}.}
 
 \item{.name_repair}{One of "unique" (default), "universal", "check_unique",
 "unique_quiet", or "universal_quiet" passed to \code{\link[vctrs:vec_cbind]{vctrs::vec_cbind()}}. See

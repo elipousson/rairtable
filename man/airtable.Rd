@@ -69,7 +69,8 @@ found in the base. If found, a table name is resolved to its table ID and
 the table \code{name}, \code{description}, and \code{fields} are set from the schema
 unless they are supplied. \code{description} stays blank if the table does not
 have a description. The base name and your permission level for the base
-are also set. If \code{FALSE} (default), no request is made and the object is
+are also set. The table model is stored in the object so \code{\link[=read_airtable]{read_airtable()}}
+and \code{\link[=list_records]{list_records()}} can use it without another request. If \code{FALSE} (default), no request is made and the object is
 not validated against Airtable. To get every table in a base, use
 \code{\link[=airtable_base]{airtable_base()}}.}
 

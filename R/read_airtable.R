@@ -30,7 +30,16 @@
 #'   rownames if id_to_col is `FALSE`.
 #' @param model Optional. A table model from [get_table_model()]. If supplied,
 #'   model is used to validate fields and sort parameters and to arrange columns
-#'   to match the order of the table model.
+#'   to match the order of the table model. If the model includes fields with
+#'   type "checkbox", unchecked values (which Airtable omits from records) are
+#'   returned as `FALSE` instead of `NA`. If `model` is `NULL`, the model stored
+#'   in `airtable` by `airtable(lookup = TRUE)` is used if available. Pass
+#'   `model` to avoid repeated requests for the model when reading a table
+#'   several times.
+#' @param lookup If `TRUE`, and no model is supplied or stored in `airtable`,
+#'   get the table model from the base schema with one additional API request.
+#'   This requires a token with the "schema.bases:read" scope. Defaults to
+#'   `FALSE`.
 #' @param max_rows Deprecated. Maximum number of rows to read.
 #' @param simplifyVector Passed to [httr2::req_body_json()]. If `FALSE`,
 #'   [get_record()] and [list_records()] both return named lists of records.
@@ -56,6 +65,7 @@ read_airtable <- function(
   airtable_id_col = NULL,
   max_rows = deprecated(),
   model = NULL,
+  lookup = FALSE,
   .name_repair = "unique",
   token = NULL,
   ...
@@ -67,6 +77,8 @@ read_airtable <- function(
       details = "Use `list_records(max_records)` to limit the number of records."
     )
   }
+
+  model <- resolve_model(model, airtable, lookup, token, ...)
 
   req <- req_airtable(
     .req = request_airtable(
@@ -102,7 +114,7 @@ read_airtable <- function(
 
   if (!is_null(model)) {
     # Reorder columns to match order in model if supplied
-    data <- arrange_record_cols(data, metadata = "id", model)
+    data <- arrange_record_cols(data, metadata = "id", model, fields = fields)
   }
 
   if (id_to_col) {
@@ -142,11 +154,14 @@ list_records <- function(
   metadata = c("id", "createdTime"),
   offset = NULL,
   model = NULL,
+  lookup = FALSE,
   .name_repair = "unique",
   simplifyVector = TRUE,
   token = NULL,
   ...
 ) {
+  model <- resolve_model(model, airtable, lookup, token, ...)
+
   req <- req_list_records(
     airtable = airtable,
     view = view,
@@ -180,7 +195,8 @@ list_records <- function(
     records <- arrange_record_cols(
       records = records,
       metadata = metadata,
-      model = model
+      model = model,
+      fields = fields
     )
   }
 
@@ -202,11 +218,14 @@ get_record <- function(
   locale = NULL,
   metadata = c("id", "createdTime"),
   model = NULL,
+  lookup = FALSE,
   .name_repair = "unique",
   simplifyVector = TRUE,
   token = NULL,
   ...
 ) {
+  model <- resolve_model(model, airtable, lookup, token, ...)
+
   req <- request_airtable(
     airtable = airtable,
     ...
@@ -682,6 +701,7 @@ arrange_record_cols <- function(
   records,
   metadata,
   model = NULL,
+  fields = NULL,
   call = caller_env()
 ) {
   metadata_nm <- names(records)[seq_along(metadata)]
@@ -694,9 +714,99 @@ arrange_record_cols <- function(
 
   cols <- c(metadata_nm, model_nm)
 
+  records <- fill_checkbox_cols(records, model, fields = fields)
+
   select_cols(
     tidyselect::any_of(cols),
     .data = records,
     error_call = call
   )
+}
+
+#' Fill unchecked checkbox values with FALSE
+#'
+#' Airtable omits unchecked checkbox fields from records so they are read as
+#' `NA` (or are missing entirely if no record in the table has the box checked).
+#' If a model is supplied, fields with type "checkbox" are set to `FALSE`
+#' wherever they are missing.
+#'
+#' @noRd
+fill_checkbox_cols <- function(records, model, fields = NULL) {
+  if (!is.data.frame(records) || is_null(model)) {
+    return(records)
+  }
+
+  model_fields <- model[["fields"]]
+
+  if (is.data.frame(model)) {
+    model_fields <- model_fields[[1]]
+  }
+
+  if (is.data.frame(model_fields)) {
+    nm <- model_fields[["name"]]
+    type <- model_fields[["type"]]
+  } else {
+    nm <- vapply(model_fields, function(x) x[["name"]] %||% NA_character_, "")
+    type <- vapply(model_fields, function(x) x[["type"]] %||% NA_character_, "")
+  }
+
+  checkbox_nm <- nm[!is.na(type) & type == "checkbox"]
+
+  if (!is_null(fields)) {
+    checkbox_nm <- intersect(checkbox_nm, fields)
+  }
+
+  for (col in checkbox_nm) {
+    value <- records[[col]]
+    if (is_null(value)) {
+      records[[col]] <- rep(FALSE, nrow(records))
+    } else {
+      value[is.na(value)] <- FALSE
+      records[[col]] <- as.logical(value)
+    }
+  }
+
+  records
+}
+
+#' Resolve the table model used to read records
+#'
+#' Uses an explicit model first, then a model stored in an airtable object by
+#' `airtable(lookup = TRUE)`, and finally (if lookup is `TRUE`) requests the
+#' model from the base schema.
+#'
+#' @noRd
+resolve_model <- function(
+  model,
+  airtable,
+  lookup = FALSE,
+  token = NULL,
+  ...,
+  call = caller_env()
+) {
+  if (!is_null(model)) {
+    return(model)
+  }
+
+  check_bool(lookup, call = call)
+
+  airtable <- as_airtable(airtable, call = call)
+
+  if (is_airtable_obj(airtable) && !is_null(airtable[["model"]])) {
+    return(airtable[["model"]])
+  }
+
+  if (!lookup) {
+    return(NULL)
+  }
+
+  dots <- list(...)
+  base <- airtable[["base"]] %||% dots[["base"]]
+  table <- airtable[["table"]] %||% dots[["table"]]
+
+  if (is_null(base) || is_null(table)) {
+    return(NULL)
+  }
+
+  lookup_table_model(base, table, token = token, call = call)
 }

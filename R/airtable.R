@@ -37,7 +37,8 @@
 #'   the table `name`, `description`, and `fields` are set from the schema
 #'   unless they are supplied. `description` stays blank if the table does not
 #'   have a description. The base name and your permission level for the base
-#'   are also set. If `FALSE` (default), no request is made and the object is
+#'   are also set. The table model is stored in the object so [read_airtable()]
+#'   and [list_records()] can use it without another request. If `FALSE` (default), no request is made and the object is
 #'   not validated against Airtable. To get every table in a base, use
 #'   [airtable_base()].
 #' @param ... Additional parameters passed to [check_airtable_obj()]. Primarily
@@ -212,6 +213,7 @@ new_airtable_obj <- function(
   check_character(view, allow_null = TRUE, call = call)
 
   permissions <- list()
+  model <- NULL
 
   if (is_true(lookup)) {
     base_info <- list_bases(bases = base, token = token)
@@ -264,6 +266,7 @@ new_airtable_obj <- function(
         "name" = name,
         "view" = view %||% list(),
         "fields" = fields %||% list(),
+        "model" = model,
         "permissions" = permissions,
         "base_url" = base_url,
         "table_url" = table_url,
