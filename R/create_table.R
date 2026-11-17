@@ -49,14 +49,16 @@
 #' @rdname create_table
 #' @export
 #' @importFrom httr2 resp_body_json
-create_table <- function(airtable = NULL,
-                         config = NULL,
-                         name = NULL,
-                         description = NULL,
-                         fields = NULL,
-                         model = NULL,
-                         token = NULL,
-                         ...) {
+create_table <- function(
+  airtable = NULL,
+  config = NULL,
+  name = NULL,
+  description = NULL,
+  fields = NULL,
+  model = NULL,
+  token = NULL,
+  ...
+) {
   if (is_null(config)) {
     config <- make_table_config(
       name = name,
@@ -118,10 +120,12 @@ create_table <- function(airtable = NULL,
 #' @rdname create_table
 #' @name update_table
 #' @export
-update_table <- function(airtable = NULL,
-                         name = NULL,
-                         description = NULL,
-                         ...) {
+update_table <- function(
+  airtable = NULL,
+  name = NULL,
+  description = NULL,
+  ...
+) {
   if (is_null(name) && is_null(description)) {
     cli_abort(
       "{.arg name} or {.arg description} must be supplied."
@@ -149,7 +153,12 @@ update_table <- function(airtable = NULL,
   }
 
   if (!is_null(description)) {
-    message <- c(message, cli::cli_fmt(cli::cli_bullets("description updated to {.val {description}}")))
+    message <- c(
+      message,
+      cli::cli_fmt(cli::cli_bullets(
+        "description updated to {.val {description}}"
+      ))
+    )
   }
 
   table_url <- paste0(

@@ -20,13 +20,15 @@
 #' @export
 #' @importFrom httr2 resp_body_json
 #' @importFrom tibble as_tibble
-create_base <- function(name,
-                        workspace = NULL,
-                        tables = NULL,
-                        schema = NULL,
-                        simplifyVector = FALSE,
-                        token = NULL,
-                        ...) {
+create_base <- function(
+  name,
+  workspace = NULL,
+  tables = NULL,
+  schema = NULL,
+  simplifyVector = FALSE,
+  token = NULL,
+  ...
+) {
   check_name(name)
 
   if (!is_null(tables) && !is_null(schema)) {
@@ -35,23 +37,26 @@ create_base <- function(name,
     )
   }
 
-  tables <- tables %||% lapply(
-    schema[["tables"]],
-    function(x) {
-      copy_table_config(model = x)
-    }
-  )
+  tables <- tables %||%
+    lapply(
+      schema[["tables"]],
+      function(x) {
+        copy_table_config(model = x)
+      }
+    )
 
   check_list(tables)
 
-  if (!all(vapply(
-    tables,
-    function(x) {
-      # TODO: Consider swapping this for check_table_config
-      all(has_name(x, c("name", "fields")))
-    },
-    TRUE
-  ))) {
+  if (
+    !all(vapply(
+      tables,
+      function(x) {
+        # TODO: Consider swapping this for check_table_config
+        all(has_name(x, c("name", "fields")))
+      },
+      TRUE
+    ))
+  ) {
     cli_abort(
       "{.arg tables} must be a list where all elements contain
       a name and field array."

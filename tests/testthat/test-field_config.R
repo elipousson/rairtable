@@ -27,18 +27,26 @@ test_that("make_list_of_lists works", {
   test_comparison <- list(list(name = "Field name", type = "singleLineText"))
 
   expect_equal(
-    make_list_of_lists(data = list(name = "Field name", type = "singleLineText")),
+    make_list_of_lists(
+      data = list(name = "Field name", type = "singleLineText")
+    ),
     test_comparison
   )
 
   expect_equal(
-    make_list_of_lists(data.frame(name = "Field name", type = "singleLineText")),
+    make_list_of_lists(data.frame(
+      name = "Field name",
+      type = "singleLineText"
+    )),
     test_comparison
   )
 
   expect_error(
     make_list_of_lists(
-      data = data.frame(name = c("A", "B"), type = c("singleLineText", "singleLineText")),
+      data = data.frame(
+        name = c("A", "B"),
+        type = c("singleLineText", "singleLineText")
+      ),
       max_rows = 1
     ),
     "must be a list or data frame with 1 row, not 2 rows."

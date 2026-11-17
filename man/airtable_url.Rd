@@ -60,8 +60,10 @@ mentioned in error messages as the source of the error. See the
 }
 \value{
 \itemize{
-\item \code{\link[=is_airtable_url]{is_airtable_url()}} returns \code{TRUE} if the input matching an Airtable URL or \code{FALSE} otherwise.
-\item \code{\link[=parse_airtable_url]{parse_airtable_url()}} returns a list of values named "base", "table", "view", or "field".
+\item \code{\link[=is_airtable_url]{is_airtable_url()}} returns \code{TRUE} if the input matching an Airtable URL
+or \code{FALSE} otherwise.
+\item \code{\link[=parse_airtable_url]{parse_airtable_url()}} returns a list of values named "base", "table",
+"view", or "field".
 }
 }
 \description{

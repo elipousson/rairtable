@@ -10,13 +10,16 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
+  eval = FALSE,
   comment = "#>"
 )
 ```
 
 ## Overview
 
-Airtable's REST API allows users to list, update, create, and delete both records on records. In November 2022, Airtable launched a public version of the Metadata API to allow users to read and edit the structure of an Airtable base. This vignette shows the functions 
+Airtable's REST API allows users to list, update, create, and delete both records on records. In November 2022, Airtable launched a public version of the Metadata API to allow users to read and edit the structure of an Airtable base.
+
+This vignette shows the functions:
 
 - `list_bases()`
 - `airtable_base()` or `get_base_schema()` (and the related helper functions `get_table_models()` and `get_table_model()`)
@@ -96,7 +99,7 @@ recs <- list_records(
   fields = "Assignee",
   model = model
 )
- 
+
 # This call will error
 # recs <- list_records(
 #   airtable = atbl,
@@ -139,9 +142,7 @@ A field config can be used to create a new field.
 
 ```{r}
 create_field(
-  base = atbl$base,
-  table = new_table$id,
-  name = "New field",
+  airtable = airtable(table = new_table$id, base = atbl$base),
   config = fld_config[[1]]
 )
 ```
@@ -159,4 +160,3 @@ create_base(
   schema = schema
 )
 ```
-

@@ -59,11 +59,54 @@ test_that("check_airtable_api_url works", {
     check_airtable_api_url("https://api.airtable.com")
   )
 
-  skip_if_no_pat()
 
   atbl <- get_rairtable_test_obj()
 
   expect_null(
     check_airtable_api_url(atbl[["request_url"]])
+  )
+})
+
+
+test_that("is_airtable_url and is_airtable_api_url reject lookalike hosts", {
+  expect_false(is_airtable_url("https://airtable.com.example.org/appABCDEFGHIJKLMN"))
+  expect_false(is_airtable_url("https://airtableXcom/appABCDEFGHIJKLMN"))
+  expect_true(is_airtable_url("https://airtable.com/appABCDEFGHIJKLMN"))
+  expect_false(is_airtable_url("https://airtable.com/shrABCDEFGHIJKLMN"))
+  expect_true(
+    is_airtable_url("https://airtable.com/shrABCDEFGHIJKLMN", allow_shared = TRUE)
+  )
+  expect_false(is_airtable_api_url("https://api.airtable.com.example.org/v0"))
+  expect_true(is_airtable_api_url("https://api.airtable.com/v0/appABCDEFGHIJKLMN"))
+})
+
+test_that("parse_url_record_id is vectorized and ignores view parameters", {
+  urls <- c(
+    "https://airtable.com/appABCDEFGHIJKLMN/tblABCDEFGHIJKLMN/viwABCDEFGHIJKLMN/recAAAAAAAAAAAAAA",
+    "https://airtable.com/appABCDEFGHIJKLMN/tblABCDEFGHIJKLMN/recBBBBBBBBBBBBBB?blocks=hide",
+    "https://airtable.com/appABCDEFGHIJKLMN/tblABCDEFGHIJKLMN?view=recCCCCCCCCCCCCCC"
+  )
+
+  expect_identical(
+    parse_url_record_id(urls),
+    c("recAAAAAAAAAAAAAA", "recBBBBBBBBBBBBBB", NA_character_)
+  )
+
+  expect_identical(
+    parse_record_urls(urls[1:2]),
+    c("recAAAAAAAAAAAAAA", "recBBBBBBBBBBBBBB")
+  )
+
+  expect_error(parse_record_urls(urls), "Can't find a record ID")
+})
+
+test_that("parse_airtable_url parses base-only URLs", {
+  expect_identical(
+    parse_airtable_url("https://airtable.com/appABCDEFGHIJKLMN"),
+    list(base = "appABCDEFGHIJKLMN")
+  )
+  expect_identical(
+    parse_airtable_url("https://airtable.com/appABCDEFGHIJKLMN?blocks=hide"),
+    list(base = "appABCDEFGHIJKLMN")
   )
 })

@@ -13,8 +13,10 @@
 #' @name airtable_url
 #' @inheritParams request_airtable
 #' @returns
-#'  - [is_airtable_url()] returns `TRUE` if the input matching an Airtable URL or `FALSE` otherwise.
-#'  - [parse_airtable_url()] returns a list of values named "base", "table", "view", or "field".
+#'  - [is_airtable_url()] returns `TRUE` if the input matching an Airtable URL
+#'    or `FALSE` otherwise.
+#'  - [parse_airtable_url()] returns a list of values named "base", "table",
+#'    "view", or "field".
 NULL
 
 #' @rdname airtable_url
@@ -38,11 +40,32 @@ is_airtable_url <- function(url, base_url = NULL, allow_shared = FALSE) {
   base_url <- base_url %||%
     getOption("rairtable.base_url", "https://airtable.com")
 
+  matches <- is_url(url) & url_has_prefix(url, base_url)
+
   if (!allow_shared) {
-    is_url(url) & grepl(paste0("^", base_url, "(?!/shr)"), url, perl = TRUE)
-  } else {
-    is_url(url) & grepl(paste0("^", base_url), url)
+    shared <- startsWith(url, paste0(sub("/+$", "", base_url), "/shr"))
+    shared[is.na(shared)] <- FALSE
+    matches <- matches & !shared
   }
+
+  matches
+}
+
+#' Does url start with prefix as a complete scheme, host, and path prefix?
+#'
+#' Unlike a regular expression match, this treats prefix literally (dots are not
+#' wildcards) and requires the prefix to end at a boundary so that
+#' "https://airtable.com.example.org" does not match "https://airtable.com".
+#'
+#' @noRd
+url_has_prefix <- function(url, prefix) {
+  prefix <- sub("/+$", "", prefix)
+  matches <- url == prefix
+  for (end in c("/", "?", "#")) {
+    matches <- matches | startsWith(url, paste0(prefix, end))
+  }
+  matches[is.na(matches)] <- FALSE
+  matches
 }
 
 #' Does x match the pattern of a URL?
@@ -68,8 +91,7 @@ is_url <- function(x) {
 #' @param api_url Expected base URL for an API url. Defaults to `NULL` and set
 #'   to `getOption("rairtable.api_url", "https://api.airtable.com/v0")`.
 #' @keywords internal
-is_airtable_api_url <- function(url,
-                                api_url = NULL) {
+is_airtable_api_url <- function(url, api_url = NULL) {
   if (!all(is_character(url))) {
     url <- as.character(url)
   }
@@ -77,7 +99,7 @@ is_airtable_api_url <- function(url,
   api_url <- api_url %||%
     getOption("rairtable.api_url", "https://api.airtable.com/v0")
 
-  is_url(url) & grepl(paste0("^", api_url), url)
+  is_url(url) & url_has_prefix(url, api_url)
 }
 
 #' @rdname airtable_url
@@ -90,15 +112,17 @@ is_airtable_api_url <- function(url,
 #'   must include a string starting with "fld" to use as the field ID .
 #' @export
 #' @importFrom vctrs list_drop_empty
-parse_airtable_url <- function(url,
-                               base_url = NULL,
-                               api_url = NULL,
-                               table_name = NULL,
-                               view_name = NULL,
-                               require_table = FALSE,
-                               require_view = FALSE,
-                               require_field = FALSE,
-                               call = caller_env()) {
+parse_airtable_url <- function(
+  url,
+  base_url = NULL,
+  api_url = NULL,
+  table_name = NULL,
+  view_name = NULL,
+  require_table = FALSE,
+  require_view = FALSE,
+  require_field = FALSE,
+  call = caller_env()
+) {
   check_url(url, call = call)
 
   ids <- vctrs::list_drop_empty(
@@ -127,10 +151,12 @@ parse_airtable_url <- function(url,
 #' Parse url and checks the input url for parse_airtable_url.
 #'
 #' @noRd
-parse_url_base_id <- function(url,
-                              base_url = NULL,
-                              api_url = NULL,
-                              call = caller_env()) {
+parse_url_base_id <- function(
+  url,
+  base_url = NULL,
+  api_url = NULL,
+  call = caller_env()
+) {
   # api_url <- api_url %||%
   #   getOption("rairtable.api_url", "https://api.airtable.com/v0")
   base_name <- "app[[:alnum:]]+"
@@ -144,7 +170,7 @@ parse_url_base_id <- function(url,
     base_url <- base_url %||%
       getOption("rairtable.base_url", "https://airtable.com")
 
-    base_pattern <- glue("(?<={base_url}/){base_name}(?=/)")
+    base_pattern <- glue("(?<={base_url}/){base_name}(?=/|\\?|#|$)")
 
     check_airtable_url(url, base_url, call = call)
   }
@@ -197,10 +223,37 @@ parse_url_record_id <- function(url) {
   record_name <- "rec[[:alnum:]]+"
 
   record_pattern <- glue(
-    "((?<=/){record_name}(?=/|\\?))|((?<=/){record_name}$)|((?<=view\\=){record_name})"
+    "((?<=/){record_name}(?=/|\\?))|((?<=/){record_name}$)"
   )
 
-  string_extract(url, record_pattern)
+  vapply(
+    as.character(url),
+    function(x) string_extract(x, record_pattern) %||% NA_character_,
+    NA_character_,
+    USE.NAMES = FALSE
+  )
+}
+
+#' Parse record IDs from a vector of record or cell URLs and error if any URL
+#' does not contain a record ID
+#'
+#' @noRd
+parse_record_urls <- function(url, call = caller_env()) {
+  ids <- parse_url_record_id(url)
+
+  if (anyNA(ids)) {
+    missing <- url[is.na(ids)]
+    cli_abort(
+      c(
+        "Can't find a record ID in {length(missing)} URL{?s}.",
+        "i" = "Record IDs start with {.val rec}.",
+        "x" = "Problem URL{?s}: {.url {missing}}"
+      ),
+      call = call
+    )
+  }
+
+  ids
 }
 
 #' Parse workspace ID from URL

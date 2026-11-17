@@ -19,7 +19,8 @@ to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat
 \item{simplifyVector}{Should JSON arrays containing only primitives (i.e.
 booleans, numbers, and strings) be caused to atomic vectors?}
 
-\item{...}{Additional parameters passed to \code{\link[=req_airtable]{req_airtable()}}}
+\item{...}{Additional parameters passed to \code{\link[=req_airtable]{req_airtable()}} (including
+\code{method} for a custom template).}
 }
 \value{
 A tibble or list of base IDs, names, and permission levels or a list

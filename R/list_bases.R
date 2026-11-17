@@ -15,10 +15,7 @@
 #' @export
 #' @importFrom httr2 resp_body_json
 #' @importFrom tibble as_tibble
-list_bases <- function(bases = NULL,
-                       token = NULL,
-                       simplifyVector = TRUE,
-                       ...) {
+list_bases <- function(bases = NULL, token = NULL, simplifyVector = TRUE, ...) {
   resp <- request_airtable_meta(
     meta = "list_base",
     token = token,
@@ -44,10 +41,12 @@ list_bases <- function(bases = NULL,
 #' matching values parameter
 #'
 #' @noRd
-filter_with_values <- function(x,
-                               values = NULL,
-                               arg = caller_arg(values),
-                               call = caller_env()) {
+filter_with_values <- function(
+  x,
+  values = NULL,
+  arg = caller_arg(values),
+  call = caller_env()
+) {
   check_character(values, arg = arg, call = call)
   if (is_list_of_lists(x)) {
     keep(x, function(x) {

@@ -5,7 +5,7 @@
 \title{Create a new airtable object}
 \usage{
 airtable(
-  table = NULL,
+  table,
   base = NULL,
   view = NULL,
   fields = list(),
@@ -14,15 +14,16 @@ airtable(
   api_url = NULL,
   api_version = deprecated(),
   token = NULL,
-  require_table = TRUE,
+  base_name = NULL,
+  lookup = FALSE,
   ...
 )
 }
 \arguments{
-\item{table}{Airtable table ID or name. Table ID values start with "tbl". If
-table is an Airtable URL matching the pattern
-"https://airtable.com/\{baseID\}/\{tableIdOrName\}/\{viewId\}" the URL is parsed
-to supply the values for base and table. If table is a named list with the
+\item{table}{Required. Airtable table ID or name. Table ID values start with
+"tbl". If table is an Airtable URL matching the pattern
+"https://airtable.com/\{baseID\}/\{tableIdOrName\}/\{viewId\}" the URL
+is parsed to supply the values for base and table. If table is a named list with the
 names "id", "name", and "description", the value for id is used as the
 value of table and name and description are passed to the respective
 parameters.}
@@ -35,10 +36,10 @@ table is a URL containing a base ID or required otherwise.}
 \item{fields}{An optional \code{airtable_fields_schema} object. Automatically
 populated in tables created by \code{airtable_base()}.}
 
-\item{name, description}{Airtable table name and base name/description.
-Optional. Base name is set by \code{\link[=list_bases]{list_bases()}} but name remains
-blank if not supplied. These parameters are only used when printing
-airtable objects.}
+\item{name, description}{Airtable table name and table description. Optional.
+Description is only set if supplied (or available from the table schema)
+and is otherwise left blank; it is never replaced by the base or table
+name.}
 
 \item{api_url}{Airtable API URL, If \code{NULL} (default), the api_url is set to
 \code{getOption("rairtable.api_url", "https://api.airtable.com/v0")}.}
@@ -50,10 +51,20 @@ default api_url.}
 to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat]{get_airtable_pat()}}) or
 "AIRTABLE_API_KEY" (from \code{\link[=get_airtable_api_key]{get_airtable_api_key()}}).}
 
-\item{require_table}{If \code{TRUE}, the string "tbl" must be included in the
-supplied url. If require_table is a string, it is treated as the required
-table name which must be part of url. If \code{FALSE} (default), there is no
-check for a table being present in the API request URL.}
+\item{base_name}{Airtable base name. Optional and only used for printing.
+Stored separately from \code{description}.}
+
+\item{lookup}{If \code{TRUE}, check the table against the base schema and fill in
+details from Airtable. This requires a token with the "schema.bases:read"
+scope and makes two API requests (\code{\link[=list_bases]{list_bases()}} and \code{\link[=get_table_models]{get_table_models()}}).
+The function errors if no table matching \code{table} (an ID or a name) is
+found in the base. If found, a table name is resolved to its table ID and
+the table \code{name}, \code{description}, and \code{fields} are set from the schema
+unless they are supplied. \code{description} stays blank if the table does not
+have a description. The base name and your permission level for the base
+are also set. If \code{FALSE} (default), no request is made and the object is
+not validated against Airtable. To get every table in a base, use
+\code{\link[=airtable_base]{airtable_base()}}.}
 
 \item{...}{Additional parameters passed to \code{\link[=check_airtable_obj]{check_airtable_obj()}}. Primarily
 intended for internal use.}

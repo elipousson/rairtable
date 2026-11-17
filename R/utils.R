@@ -4,11 +4,7 @@
 #' @noRd
 #' @importFrom cli symbol pb_bar pb_percent cli_progress_along
 #' @importFrom rlang with_options
-map_along <- function(x,
-                      .f,
-                      ...,
-                      action = NULL,
-                      format = NULL) {
+map_along <- function(x, .f, ..., action = NULL, format = NULL) {
   format <- format %||%
     "{cli::symbol$arrow_right} {action}: {cli::pb_bar} | {cli::pb_percent}"
 
@@ -36,10 +32,12 @@ is_list_of_lists <- function(x) {
 #' Split list or vector into equal size pieces
 #'
 #' @noRd
-split_list <- function(x,
-                       batch_size = NULL,
-                       arg = caller_arg(x),
-                       call = caller_env()) {
+split_list <- function(
+  x,
+  batch_size = NULL,
+  arg = caller_arg(x),
+  call = caller_env()
+) {
   check_required(x, arg = arg, call = call)
 
   batch_size <- batch_size %||%
@@ -72,9 +70,13 @@ set_list_names <- function(x, nm = NULL, at = "name") {
 
 #' @noRd
 names_at <- function(x, at = "name") {
-  vapply(x, function(x) {
-    x[[at]]
-  }, NA_character_)
+  vapply(
+    x,
+    function(x) {
+      x[[at]]
+    },
+    NA_character_
+  )
 }
 
 #' Return data, response body, or combined body from list of response objects
@@ -104,12 +106,14 @@ return_data_resp <- function(data = NULL, resp = NULL, return_data = TRUE) {
 #'
 #' @noRd
 #' @importFrom vctrs obj_check_list
-check_list <- function(x,
-                       allow_na = FALSE,
-                       allow_empty = FALSE,
-                       allow_null = FALSE,
-                       arg = caller_arg(x),
-                       call = caller_env()) {
+check_list <- function(
+  x,
+  allow_na = FALSE,
+  allow_empty = FALSE,
+  allow_null = FALSE,
+  arg = caller_arg(x),
+  call = caller_env()
+) {
   if (allow_na && is.na(x)) {
     return(invisible(NULL))
   }
@@ -145,13 +149,15 @@ check_list <- function(x,
 #' @param yes Character vector of acceptable "yes" response options.
 #' @inheritParams cli_ask
 #' @noRd
-safety_check <- function(safely = NULL,
-                         ...,
-                         prompt = "Do you want to continue?",
-                         yes = c("", "Y", "Yes", "Yup", "Yep", "Yeah"),
-                         message = "Aborted. A yes is required to continue.",
-                         .envir = parent.frame(),
-                         call = rlang::caller_env()) {
+safety_check <- function(
+  safely = NULL,
+  ...,
+  prompt = "Do you want to continue?",
+  yes = c("", "Y", "Yes", "Yup", "Yep", "Yeah"),
+  message = "Aborted. A yes is required to continue.",
+  .envir = parent.frame(),
+  call = rlang::caller_env()
+) {
   safely <- safely %||% getOption("rairtable.safely", TRUE)
   check_bool(safely, call = call)
 
@@ -179,10 +185,12 @@ safety_check <- function(safely = NULL,
 #' Adapted from cliExtras::cli_ask()
 #'
 #' @noRd
-cli_ask <- function(prompt = "?",
-                    ...,
-                    .envir = rlang::caller_env(),
-                    call = .envir) {
+cli_ask <- function(
+  prompt = "?",
+  ...,
+  .envir = rlang::caller_env(),
+  call = .envir
+) {
   if (!rlang::is_interactive()) {
     cli_abort(
       "User interaction is required.",

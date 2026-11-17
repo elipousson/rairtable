@@ -21,13 +21,16 @@
 #' set_airtable_api_key("XXXXXXXXXX", install = TRUE)
 #' }
 #'
-set_airtable_api_key <- function(key,
-                                 install = FALSE,
-                                 overwrite = FALSE,
-                                 default = "AIRTABLE_API_KEY",
-                                 call = caller_env()) {
+set_airtable_api_key <- function(
+  key,
+  install = FALSE,
+  overwrite = FALSE,
+  default = "AIRTABLE_API_KEY",
+  call = caller_env()
+) {
   cli_warn(
-    c("Airtable API keys will no longer be supported starting in early 2024.",
+    c(
+      "Airtable API keys will no longer be supported starting in early 2024.",
       "i" = "Moving forward, using {.fn set_airtable_pat} with a personal
       access token is strongly recommended."
     ),
@@ -44,16 +47,20 @@ set_airtable_api_key <- function(key,
 #' @rdname set_airtable_api_key
 #' @name get_airtable_api_key
 #' @export
-get_airtable_api_key <- function(key = NULL,
-                                 default = "AIRTABLE_API_KEY",
-                                 call = caller_env()) {
+get_airtable_api_key <- function(
+  key = NULL,
+  default = "AIRTABLE_API_KEY",
+  call = caller_env()
+) {
   default <- getOption("rairtable.api_default", default)
 
   get_airtable_token(
     key,
-    message = c("API key can't be found at {.envvar {default}}.",
+    message = c(
+      "API key can't be found at {.envvar {default}}.",
       "*" = "Use {.fn set_airtable_api_key} to set {.envvar {default}}."
     ),
-    default = default, call = call
+    default = default,
+    call = call
   )
 }

@@ -21,22 +21,24 @@
 #' @param batch_size Deprecated. Number of records to delete in a single batch.
 #'   batch_size can now be set using the "rairtable.batch_size" option.
 #' @inheritParams request_airtable
-#' @param return_records If `FALSE`, return the JSON response from the Airtable
+#' @param return_data If `FALSE`, return the JSON response from the Airtable
 #'   API. If `TRUE` (default), return a vector of deleted record IDs.
 #' @inheritDotParams request_airtable -api_url -call
 #' @returns A vector of deleted record IDs returned invisibly.
 #'
 #' @export
 #' @importFrom cli cli_alert_warning
-delete_records <- function(data = NULL,
-                           airtable = NULL,
-                           airtable_id_col = NULL,
-                           records = NULL,
-                           safely = NULL,
-                           batch_size = deprecated(),
-                           return_records = TRUE,
-                           token = NULL,
-                           ...) {
+delete_records <- function(
+  data = NULL,
+  airtable = NULL,
+  airtable_id_col = NULL,
+  records = NULL,
+  safely = NULL,
+  batch_size = deprecated(),
+  return_data = TRUE,
+  token = NULL,
+  ...
+) {
   if (is_null(data) && is_null(records)) {
     cli_abort(
       "{.arg data} or {.arg records} must be supplied."
@@ -63,7 +65,7 @@ delete_records <- function(data = NULL,
       )
     }
   } else if (all(is_url(records))) {
-    records <- parse_url_record_id(records)
+    records <- parse_record_urls(records)
   }
 
   check_character(records)
@@ -94,7 +96,7 @@ delete_records <- function(data = NULL,
     msg_failed = "Can't delete records."
   )
 
-  return_data_resp(records, resp, return_records)
+  return_data_resp(records, resp, return_data)
 }
 
 
@@ -112,11 +114,13 @@ delete_records <- function(data = NULL,
 #' @inheritDotParams request_airtable
 #' @keywords internal
 #' @importFrom httr2 req_url_path_append req_perform
-req_delete_records <- function(req = NULL,
-                               ...,
-                               records,
-                               token = NULL,
-                               call = caller_env()) {
+req_delete_records <- function(
+  req = NULL,
+  ...,
+  records,
+  token = NULL,
+  call = caller_env()
+) {
   check_character(records, call = call)
   n_records <- length(records)
 
@@ -159,11 +163,7 @@ req_delete_records <- function(req = NULL,
     return(resp)
   }
 
-  # FIXME: There is likely a better way to do this with httr2::req_url_query()
-  req <- httr2::req_url_path_append(
-    req,
-    paste0("?", paste0("records=", records, collapse = "&"))
-  )
+  req <- httr2::req_url_query(req, records = records, .multi = "explode")
 
   httr2::req_perform(req, error_call = call)
 }
@@ -172,11 +172,13 @@ req_delete_records <- function(req = NULL,
 #' @name req_delete_record
 #' @keywords internal
 #' @importFrom httr2 req_perform
-req_delete_record <- function(req = NULL,
-                              ...,
-                              record,
-                              token = NULL,
-                              call = caller_env()) {
+req_delete_record <- function(
+  req = NULL,
+  ...,
+  record,
+  token = NULL,
+  call = caller_env()
+) {
   req <- req_airtable(
     .req = req %||% request_airtable(..., call = call),
     record = record,

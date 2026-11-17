@@ -22,6 +22,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Matthew Rogers \email{matthew.rogers09@gmail.com}
   \item Eli Pousson (\href{https://orcid.org/0000-0001-8280-1706}{ORCID})
 }
 

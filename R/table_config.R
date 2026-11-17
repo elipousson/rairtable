@@ -13,12 +13,14 @@
 #' @param fields Field list.
 #' @inheritParams rlang::args_error_context
 #' @export
-make_table_config <- function(name = NULL,
-                              description = NULL,
-                              fields = NULL,
-                              model = NULL,
-                              ...,
-                              call = caller_env()) {
+make_table_config <- function(
+  name = NULL,
+  description = NULL,
+  fields = NULL,
+  model = NULL,
+  ...,
+  call = caller_env()
+) {
   if (!is_null(model)) {
     table_config <- copy_table_config(
       model = model,
@@ -63,13 +65,15 @@ make_table_config <- function(name = NULL,
 #' @param airtable A `airtable` object or Airtable base URL. Required if `table` is a table ID and `model` is not supplied.
 #' @inheritDotParams get_table_model
 #' @export
-copy_table_config <- function(table = NULL,
-                              model = NULL,
-                              name = NULL,
-                              description = NULL,
-                              airtable = NULL,
-                              ...,
-                              call = caller_env()) {
+copy_table_config <- function(
+  table = NULL,
+  model = NULL,
+  name = NULL,
+  description = NULL,
+  airtable = NULL,
+  ...,
+  call = caller_env()
+) {
   if (!all(has_name(model, c("name", "fields")))) {
     table <- table %||% model
 
@@ -96,10 +100,12 @@ copy_table_config <- function(table = NULL,
 #'
 #' @keywords internal
 #' @noRd
-check_table_config <- function(config,
-                               allow_empty = FALSE,
-                               allow_null = FALSE,
-                               call = caller_env()) {
+check_table_config <- function(
+  config,
+  allow_empty = FALSE,
+  allow_null = FALSE,
+  call = caller_env()
+) {
   if (allow_null && is_null(config)) {
     return(invisible(NULL))
   }

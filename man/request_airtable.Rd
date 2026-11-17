@@ -7,7 +7,6 @@
 \usage{
 request_airtable(
   airtable = NULL,
-  url = NULL,
   base = NULL,
   table = NULL,
   view = NULL,
@@ -22,7 +21,6 @@ request_airtable(
 req_airtable(
   .req = NULL,
   airtable = NULL,
-  url = NULL,
   api_url = NULL,
   ...,
   template = NULL,
@@ -38,19 +36,16 @@ req_airtable(
 )
 }
 \arguments{
-\item{airtable}{An airtable class object created with \code{\link[=airtable]{airtable()}}. airtable
-must include a request_url attribute. url is ignored if airtable is
-provided. Optional if url or base \emph{and} table are supplied.}
+\item{airtable}{An airtable class object created with \code{\link[=airtable]{airtable()}} or an
+Airtable URL for a table or view (e.g.
+"https://airtable.com/\{baseID\}/\{tableID\}/\{viewID\}"). A URL is
+converted to an airtable object. airtable must include a request_url
+attribute. If airtable is supplied, base, table, and view are ignored.
+Optional if base \emph{and} table are supplied.}
 
-\item{url}{A URL for an API call or an Airtable view. If url is provided and
-is a valid URL, \code{\link[=request_airtable]{request_airtable()}} returns  \code{httr2::request(url)}. url
-is optional if airtable \emph{or} base and table are supplied. If url is an
-Airtable view, any additional base or table values provided are ignored. If
-airtable is provided, any supplied url is ignored.}
-
-\item{base}{Airtable base id starting with with "app". Optional if url or
-airtable are supplied or if require_base is \code{FALSE}. base and table are
-both required if url and airtable are \code{NULL} and require_base is \code{TRUE}.}
+\item{base}{Airtable base id starting with with "app". Optional if airtable
+is supplied or if require_base is \code{FALSE}. base and table are both
+required if airtable is \code{NULL} and require_base is \code{TRUE}.}
 
 \item{table}{Airtable table id or name. Table ID values are strings starting
 with "tbl". Optional if require_table is \code{FALSE}.}
@@ -73,17 +68,9 @@ check for a table being present in the API request URL.}
 string supplied to url. If \code{FALSE} (default), there is no check
 for a view being present in the API request URL.}
 
-\item{...}{
-  Arguments passed on to \code{\link[=parse_airtable_url]{parse_airtable_url}}
-  \describe{
-    \item{\code{base_url}}{Base URL for an Airtable base or view. Defaults \code{NULL} and
-set to \code{getOption("rairtable.base_url", "https://airtable.com")}.}
-    \item{\code{table_name,view_name}}{Pattern to use when parsing a table name or view
-name. Defaults to \code{NULL} which extracts strings starting with "tbl" for
-tables IDs and "viw" for view IDs.}
-    \item{\code{require_field}}{If \code{TRUE}, the url supplied to \code{\link[=parse_airtable_url]{parse_airtable_url()}}
-must include a string starting with "fld" to use as the field ID .}
-  }}
+\item{...}{For \code{\link[=request_airtable]{request_airtable()}}, not used. For \code{\link[=req_airtable]{req_airtable()}},
+additional parameters passed to \code{\link[httr2:req_template]{httr2::req_template()}} if template is not
+\code{NULL} or \code{\link[httr2:req_url_query]{httr2::req_url_query()}} if template is \code{NULL}.}
 
 \item{call}{The execution environment of a currently
 running function, e.g. \code{caller_env()}. The function will be
@@ -124,18 +111,37 @@ contain a view query parameter parsed from the url or view supplied to
 httr2_request. \code{\link[=req_airtable]{req_airtable()}} returns a modified HTTP request.
 }
 \description{
-These internal functions are designed for developers interested in
-interacting directly with the Airtable API with or without using the airtable
-class implemented in this package.
+Low-level functions for interacting directly with the Airtable API with or
+without using the airtable class implemented in this package. Use them to
+call API endpoints that do not have a corresponding function in this package.
+For the metadata API, see \code{\link[=request_airtable_meta]{request_airtable_meta()}}.
 }
 \details{
 \code{\link[=request_airtable]{request_airtable()}} creates an initial request object based on an airtable
-object, API url, Airtable view URL, or base and table IDs.
+object (or Airtable table URL) or base and table IDs.
 
 \code{\link[=req_airtable]{req_airtable()}} builds an API request optionally using a template or custom
 HTTP method (other than GET or POST). This function can create an initial
-request using a URL or airtable object or use an existing request object. The
-function also set the rate limit, user agent, and authenticate an Airtable
-API request.
+request using an airtable object or use any existing httr2 request object
+(e.g. \code{httr2::request("https://api.airtable.com/v0/...")}). The function also
+sets the rate limit, user agent, and authenticates the Airtable API request.
 }
-\keyword{internal}
+\examples{
+\dontrun{
+# A request for a base (without a table) using the base ID
+req <- request_airtable(
+  base = "appXXXXXXXXXXXXX",
+  require_table = FALSE
+)
+
+# Add a path and authentication for an endpoint that does not have a
+# corresponding function in this package
+req <- req_airtable(
+  .req = httr2::req_url_path_append(req, "tblXXXXXXXXXXXXX"),
+  method = "GET",
+  require_table = FALSE
+)
+httr2::resp_body_json(httr2::req_perform(req))
+}
+
+}

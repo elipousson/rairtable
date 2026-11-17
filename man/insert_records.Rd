@@ -26,9 +26,12 @@ create_records(
 \arguments{
 \item{data}{A data frame with records to insert or create.}
 
-\item{airtable}{An airtable class object created with \code{\link[=airtable]{airtable()}}. airtable
-must include a request_url attribute. url is ignored if airtable is
-provided. Optional if url or base \emph{and} table are supplied.}
+\item{airtable}{An airtable class object created with \code{\link[=airtable]{airtable()}} or an
+Airtable URL for a table or view (e.g.
+"https://airtable.com/\{baseID\}/\{tableID\}/\{viewID\}"). A URL is
+converted to an airtable object. airtable must include a request_url
+attribute. If airtable is supplied, base, table, and view are ignored.
+Optional if base \emph{and} table are supplied.}
 
 \item{typecast}{If \code{TRUE} (default), values will be converted to match the
 base if possible. typecase must be set to \code{TRUE} to add new values to a
@@ -41,16 +44,14 @@ base. Required.}
 as a list. If \code{TRUE} (default) and data is not \code{NULL}, return input data
 frame or list.}
 
-\item{...}{For \code{\link[=request_airtable]{request_airtable()}}, additional parameters passed to
-\code{\link[=parse_airtable_url]{parse_airtable_url()}} if an Airtable url is provided. For
-\code{\link[=req_airtable]{req_airtable()}}, additional parameters passed to
-\code{\link[httr2:req_template]{httr2::req_template()}} if template is not \code{NULL} or
-\code{\link[httr2:req_url]{httr2::req_url_query()}} if template is \code{NULL}.}
+\item{...}{For \code{\link[=request_airtable]{request_airtable()}}, not used. For \code{\link[=req_airtable]{req_airtable()}},
+additional parameters passed to \code{\link[httr2:req_template]{httr2::req_template()}} if template is not
+\code{NULL} or \code{\link[httr2:req_url_query]{httr2::req_url_query()}} if template is \code{NULL}.}
 }
 \value{
 A data frame (invisibly) of the input data, to be stored as an object
 or piped into additional functions or, if as_json is \code{TRUE}, the function
-returns the parsed API response from \code{\link[httr2:resp_body_raw]{httr2::resp_body_json()}}.
+returns the parsed API response from \code{\link[httr2:resp_body_json]{httr2::resp_body_json()}}.
 }
 \description{
 Insert or create new records in an existing Airtable table from a data frame

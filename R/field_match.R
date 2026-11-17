@@ -18,12 +18,14 @@ field_type_match <- function(
 #' Match a field name to a vector of names from a table model
 #'
 #' @noRd
-field_name_match <- function(nm,
-                             values = NULL,
-                             model = NULL,
-                             multiple = TRUE,
-                             error_arg = caller_arg(nm),
-                             error_call = caller_env()) {
+field_name_match <- function(
+  nm,
+  values = NULL,
+  model = NULL,
+  multiple = TRUE,
+  error_arg = caller_arg(nm),
+  error_call = caller_env()
+) {
   values <- values %||% names_at(model[["fields"]])
 
   arg_match(

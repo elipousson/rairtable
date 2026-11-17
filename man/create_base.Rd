@@ -34,7 +34,8 @@ booleans, numbers, and strings) be caused to atomic vectors?}
 to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat]{get_airtable_pat()}}) or
 "AIRTABLE_API_KEY" (from \code{\link[=get_airtable_api_key]{get_airtable_api_key()}}).}
 
-\item{...}{Additional parameters passed to \code{\link[=req_airtable]{req_airtable()}}}
+\item{...}{Additional parameters passed to \code{\link[=req_airtable]{req_airtable()}} (including
+\code{method} for a custom template).}
 }
 \description{
 Use the Airtable Metadata API to create a new Airtable bases. If schema is

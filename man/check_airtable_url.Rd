@@ -23,12 +23,6 @@ check_airtable_api_url(
 )
 }
 \arguments{
-\item{url}{A URL for an API call or an Airtable view. If url is provided and
-is a valid URL, \code{\link[=request_airtable]{request_airtable()}} returns  \code{httr2::request(url)}. url
-is optional if airtable \emph{or} base and table are supplied. If url is an
-Airtable view, any additional base or table values provided are ignored. If
-airtable is provided, any supplied url is ignored.}
-
 \item{allow_null}{If \code{FALSE} (default) and url is \code{NULL},
 \code{\link[=check_airtable_url]{check_airtable_url()}} errors. If \code{TRUE}, a \code{NULL} value for url is
 allowed.}

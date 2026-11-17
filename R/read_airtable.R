@@ -51,15 +51,17 @@
 #' @importFrom cli cli_bullets
 #' @importFrom tibble column_to_rownames
 
-read_airtable <- function(airtable = NULL,
-                          fields = NULL,
-                          id_to_col = TRUE,
-                          airtable_id_col = NULL,
-                          max_rows = deprecated(),
-                          model = NULL,
-                          .name_repair = "unique",
-                          token = NULL,
-                          ...) {
+read_airtable <- function(
+  airtable = NULL,
+  fields = NULL,
+  id_to_col = TRUE,
+  airtable_id_col = NULL,
+  max_rows = deprecated(),
+  model = NULL,
+  .name_repair = "unique",
+  token = NULL,
+  ...
+) {
   req <- req_airtable(
     .req = request_airtable(
       airtable = airtable,
@@ -117,26 +119,28 @@ read_airtable <- function(airtable = NULL,
 #' @inheritParams req_list_records
 #' @inheritParams req_perform_offset
 #' @export
-list_records <- function(airtable = NULL,
-                         view = NULL,
-                         airtable_id_col = NULL,
-                         fields = NULL,
-                         sort = NULL,
-                         direction = "asc",
-                         filter = NULL,
-                         fields_by_id = FALSE,
-                         cell_format = NULL,
-                         tz = NULL,
-                         locale = NULL,
-                         max_records = NULL,
-                         page_size = NULL,
-                         metadata = c("id", "createdTime"),
-                         offset = NULL,
-                         model = NULL,
-                         .name_repair = "unique",
-                         simplifyVector = TRUE,
-                         token = NULL,
-                         ...) {
+list_records <- function(
+  airtable = NULL,
+  view = NULL,
+  airtable_id_col = NULL,
+  fields = NULL,
+  sort = NULL,
+  direction = "asc",
+  filter = NULL,
+  fields_by_id = FALSE,
+  cell_format = NULL,
+  tz = NULL,
+  locale = NULL,
+  max_records = NULL,
+  page_size = NULL,
+  metadata = c("id", "createdTime"),
+  offset = NULL,
+  model = NULL,
+  .name_repair = "unique",
+  simplifyVector = TRUE,
+  token = NULL,
+  ...
+) {
   req <- req_list_records(
     airtable = airtable,
     view = view,
@@ -183,18 +187,20 @@ list_records <- function(airtable = NULL,
 #'   [get_record()] unless a field or cell URL is provided.
 #' @export
 #' @importFrom httr2 req_perform
-get_record <- function(airtable = NULL,
-                       record = NULL,
-                       airtable_id_col = NULL,
-                       cell_format = NULL,
-                       tz = NULL,
-                       locale = NULL,
-                       metadata = c("id", "createdTime"),
-                       model = NULL,
-                       .name_repair = "unique",
-                       simplifyVector = TRUE,
-                       token = NULL,
-                       ...) {
+get_record <- function(
+  airtable = NULL,
+  record = NULL,
+  airtable_id_col = NULL,
+  cell_format = NULL,
+  tz = NULL,
+  locale = NULL,
+  metadata = c("id", "createdTime"),
+  model = NULL,
+  .name_repair = "unique",
+  simplifyVector = TRUE,
+  token = NULL,
+  ...
+) {
   req <- request_airtable(
     airtable = airtable,
     ...
@@ -275,30 +281,33 @@ get_record <- function(airtable = NULL,
 #' @keywords internal
 #' @importFrom httr2 req_url_query
 #' @importFrom rlang exec
-req_list_records <- function(req = NULL,
-                             airtable = NULL,
-                             view = NULL,
-                             fields = NULL,
-                             sort = NULL,
-                             direction = "asc",
-                             filter = NULL,
-                             fields_by_id = FALSE,
-                             cell_format = NULL,
-                             tz = NULL,
-                             locale = NULL,
-                             metadata = c("id", "createdTime"),
-                             max_records = NULL,
-                             page_size = NULL,
-                             model = NULL,
-                             token = NULL,
-                             ...,
-                             call = caller_env()) {
-  req <- req %||% request_airtable(
-    airtable = airtable,
-    view = view,
-    ...,
-    call = call
-  )
+req_list_records <- function(
+  req = NULL,
+  airtable = NULL,
+  view = NULL,
+  fields = NULL,
+  sort = NULL,
+  direction = "asc",
+  filter = NULL,
+  fields_by_id = FALSE,
+  cell_format = NULL,
+  tz = NULL,
+  locale = NULL,
+  metadata = c("id", "createdTime"),
+  max_records = NULL,
+  page_size = NULL,
+  model = NULL,
+  token = NULL,
+  ...,
+  call = caller_env()
+) {
+  req <- req %||%
+    request_airtable(
+      airtable = airtable,
+      view = view,
+      ...,
+      call = call
+    )
 
   if (!is_null(sort)) {
     req <- req_records_sort(
@@ -362,10 +371,7 @@ req_list_records <- function(req = NULL,
 #' Add fields to list records request with optional validation
 #'
 #' @noRd
-req_records_fields <- function(req,
-                               fields,
-                               model = NULL,
-                               call = caller_env()) {
+req_records_fields <- function(req, fields, model = NULL, call = caller_env()) {
   if (!is_null(model)) {
     fields <- field_name_match(
       fields,
@@ -384,11 +390,13 @@ req_records_fields <- function(req,
 #'
 #' @noRd
 #' @importFrom vctrs vec_recycle
-req_records_sort <- function(req,
-                             sort,
-                             direction = "asc",
-                             model = NULL,
-                             call = caller_env()) {
+req_records_sort <- function(
+  req,
+  sort,
+  direction = "asc",
+  model = NULL,
+  call = caller_env()
+) {
   if (!is_null(model)) {
     sort <- field_name_match(
       sort,
@@ -427,10 +435,12 @@ req_records_sort <- function(req,
 #' Add commentCount to request if required by metadata values
 #'
 #' @noRd
-req_record_metadata <- function(req,
-                                metadata,
-                                values = c("id", "createdTime", "commentCount"),
-                                call = caller_env()) {
+req_record_metadata <- function(
+  req,
+  metadata,
+  values = c("id", "createdTime", "commentCount"),
+  call = caller_env()
+) {
   metadata <- record_metadata_match(metadata, values = values, call = call)
 
   if ("commentCount" %in% metadata) {
@@ -443,11 +453,13 @@ req_record_metadata <- function(req,
 #' Add a cell format parameter to a request
 #'
 #' @noRd
-req_record_cell_format <- function(req,
-                                   cell_format = NULL,
-                                   tz = NULL,
-                                   locale = NULL,
-                                   call = caller_env()) {
+req_record_cell_format <- function(
+  req,
+  cell_format = NULL,
+  tz = NULL,
+  locale = NULL,
+  call = caller_env()
+) {
   cell_format <- cell_format %||% "json"
   cell_format <- arg_match0(cell_format, c("json", "string"), error_call = call)
 
@@ -477,15 +489,17 @@ req_record_cell_format <- function(req,
 #' @importFrom httr2 req_url_query req_perform resp_body_json
 #' @importFrom tibble as_tibble
 #' @importFrom vctrs vec_init
-req_perform_offset <- function(req,
-                               offset = NULL,
-                               type = "combine",
-                               airtable_id_col = NULL,
-                               metadata = c("id", "createdTime", "commentCount"),
-                               max_rows = NULL,
-                               .name_repair = "unique",
-                               simplifyVector = TRUE,
-                               call = caller_env()) {
+req_perform_offset <- function(
+  req,
+  offset = NULL,
+  type = "combine",
+  airtable_id_col = NULL,
+  metadata = c("id", "createdTime", "commentCount"),
+  max_rows = NULL,
+  .name_repair = "unique",
+  simplifyVector = TRUE,
+  call = caller_env()
+) {
   max_rows <- max_rows %||% 50000
   check_number_whole(max_rows, max = 50000, call = call)
   if (!is_null(metadata)) {
@@ -551,14 +565,16 @@ req_perform_offset <- function(req,
 #' @importFrom cli cli_warn
 #' @importFrom tidyselect any_of
 #' @importFrom vctrs vec_cbind
-resp_body_records <- function(resp,
-                              simplifyVector = TRUE,
-                              type = "combine",
-                              airtable_id_col = NULL,
-                              metadata = c("id", "createdTime", "commentCount"),
-                              .name_repair = "unique",
-                              ...,
-                              call = caller_env()) {
+resp_body_records <- function(
+  resp,
+  simplifyVector = TRUE,
+  type = "combine",
+  airtable_id_col = NULL,
+  metadata = c("id", "createdTime", "commentCount"),
+  .name_repair = "unique",
+  ...,
+  call = caller_env()
+) {
   body <- httr2::resp_body_json(resp, simplifyVector = simplifyVector)
 
   if (!simplifyVector) {
@@ -566,7 +582,8 @@ resp_body_records <- function(resp,
   }
 
   type <- arg_match0(
-    type, c("records", "fields", "combine"),
+    type,
+    c("records", "fields", "combine"),
     error_call = call
   )
 
@@ -610,7 +627,8 @@ resp_body_records <- function(resp,
     fields <- as.data.frame(fields)
   }
 
-  switch(type,
+  switch(
+    type,
     "records" = records,
     "fields" = fields,
     "combine" = vctrs::vec_cbind(
@@ -626,9 +644,11 @@ resp_body_records <- function(resp,
 #' Match metadata argument
 #'
 #' @noRd
-record_metadata_match <- function(metadata,
-                                  values = c("id", "createdTime", "commentCount"),
-                                  call = caller_env()) {
+record_metadata_match <- function(
+  metadata,
+  values = c("id", "createdTime", "commentCount"),
+  call = caller_env()
+) {
   arg_match(
     metadata,
     values = values,
@@ -641,10 +661,12 @@ record_metadata_match <- function(metadata,
 #'
 #' @noRd
 #' @importFrom tidyselect any_of
-arrange_record_cols <- function(records,
-                                metadata,
-                                model = NULL,
-                                call = caller_env()) {
+arrange_record_cols <- function(
+  records,
+  metadata,
+  model = NULL,
+  call = caller_env()
+) {
   metadata_nm <- names(records)[seq_along(metadata)]
 
   if (is.data.frame(model)) {

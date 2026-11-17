@@ -68,8 +68,8 @@ include in the returned data frame or list. For \code{\link[=get_table_model]{ge
 can be a schema but is typically expected to be a table name or ID.}
 
 \item{schema}{A base schema list from \code{\link[=get_base_schema]{get_base_schema()}} using
-\code{simplifyVector = FALSE}. Optional if base is supplied (or if airtable or url
-are supplied with additional parameters).}
+\code{simplifyVector = FALSE}. Optional if base is supplied (or if airtable or
+url are supplied with additional parameters).}
 
 \item{i}{Index value for the table to return passed to \code{\link[vctrs:vec_slice]{vctrs::vec_slice()}}.
 Defaults to 1 which returns the first table from the tables listed in the

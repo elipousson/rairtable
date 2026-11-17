@@ -34,9 +34,7 @@
 #' # view base schema
 #' print(base$schema)
 #' }
-airtable_base <- function(base = NULL,
-                          token = NULL,
-                          ...) {
+airtable_base <- function(base = NULL, token = NULL, ...) {
   base <- get_base_id(
     base = base,
     ...,
@@ -47,6 +45,11 @@ airtable_base <- function(base = NULL,
     token = token,
     simplifyVector = FALSE
   )
+
+  # The schema response does not include the base name so look it up once for
+  # all tables
+  base_info <- list_bases(bases = base, token = token)
+  base_name <- base_info[["name"]]
 
   base_schema <- base_schema[["tables"]]
 
@@ -69,6 +72,7 @@ airtable_base <- function(base = NULL,
 
   list(
     "base" = base,
+    "base_name" = base_name,
     "schema" = base_schema,
     "tables" = map(
       base_schema,
@@ -78,7 +82,9 @@ airtable_base <- function(base = NULL,
           name = tbl[["name"]],
           description = tbl[["description"]],
           fields = as.list(names(tbl[["fields"]])),
-          base = base
+          base = base,
+          base_name = base_name,
+          token = token
         )
       }
     )
@@ -90,11 +96,13 @@ airtable_base <- function(base = NULL,
 #' @inheritParams httr2::resp_body_json
 #' @export
 #' @importFrom httr2 resp_body_json
-get_base_schema <- function(base = NULL,
-                            token = NULL,
-                            simplifyVector = TRUE,
-                            ...,
-                            call = caller_env()) {
+get_base_schema <- function(
+  base = NULL,
+  token = NULL,
+  simplifyVector = TRUE,
+  ...,
+  call = caller_env()
+) {
   resp <- request_airtable_meta(
     base = base,
     ...,
@@ -112,18 +120,20 @@ get_base_schema <- function(base = NULL,
 #'   include in the returned data frame or list. For [get_table_model()], table
 #'   can be a schema but is typically expected to be a table name or ID.
 #' @param schema A base schema list from [get_base_schema()] using
-#'   `simplifyVector = FALSE`. Optional if base is supplied (or if airtable or url
-#'   are supplied with additional parameters).
+#'   `simplifyVector = FALSE`. Optional if base is supplied (or if airtable or
+#'   url are supplied with additional parameters).
 #' @aliases list_base_tables
 #' @export
 #' @importFrom tibble as_tibble
 #' @importFrom vctrs obj_check_list
-get_table_models <- function(base = NULL,
-                             tables = NULL,
-                             schema = NULL,
-                             token = NULL,
-                             ...,
-                             call = caller_env()) {
+get_table_models <- function(
+  base = NULL,
+  tables = NULL,
+  schema = NULL,
+  token = NULL,
+  ...,
+  call = caller_env()
+) {
   schema <- schema %||%
     get_base_schema(
       base = base,
@@ -157,12 +167,14 @@ get_table_models <- function(base = NULL,
 #'   base schema.
 #' @export
 #' @importFrom vctrs vec_slice
-get_table_model <- function(table = NULL,
-                            schema = NULL,
-                            simplifyVector = FALSE,
-                            i = 1,
-                            ...,
-                            call = caller_env()) {
+get_table_model <- function(
+  table = NULL,
+  schema = NULL,
+  simplifyVector = FALSE,
+  i = 1,
+  ...,
+  call = caller_env()
+) {
   # If a schema is supplied to table
   if (is.list(table) && has_name(table, "tables")) {
     # expect error if more than nth tables are include in schema
@@ -232,7 +244,11 @@ print.airtable_base_schema <- function(x, ...) {
   cli::cli_bullets(
     set_names(
       paste0(
-        "{.value ", names_at(x, "name"), "} - {.field ", names_at(x, "id"), "}"
+        "{.value ",
+        names_at(x, "name"),
+        "} - {.field ",
+        names_at(x, "id"),
+        "}"
       ),
       rep_len("*", n_tbls)
     )
@@ -301,7 +317,11 @@ print.airtable_fields_schema <- function(x, ...) {
   cli::cli_bullets(
     set_names(
       paste0(
-        "{.field ", names_at(x, "name"), "} - {.code ", names_at(x, "type"), "}"
+        "{.field ",
+        names_at(x, "name"),
+        "} - {.code ",
+        names_at(x, "type"),
+        "}"
       ),
       rep_len("*", n_fields)
     )

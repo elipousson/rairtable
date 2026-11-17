@@ -23,13 +23,15 @@ is_airtable_obj <- function(x) {
 #' @param allow_null If `FALSE` and x is `NULL`, returns an error. If `TRUE`,
 #'   invisibly returns NULL.
 #' @keywords internal
-check_airtable_obj <- function(x,
-                               require_url = TRUE,
-                               require_table = TRUE,
-                               require_view = FALSE,
-                               require_fields = FALSE,
-                               allow_null = FALSE,
-                               call = caller_env()) {
+check_airtable_obj <- function(
+  x,
+  require_url = TRUE,
+  require_table = TRUE,
+  require_view = FALSE,
+  require_fields = FALSE,
+  allow_null = FALSE,
+  call = caller_env()
+) {
   if (allow_null && is_null(x)) {
     return(invisible(NULL))
   }

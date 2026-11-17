@@ -11,3 +11,4 @@
 ^codemeta\.json$
 ^README\.Rmd$
 ^data-raw$
+^R/scratch\.R$

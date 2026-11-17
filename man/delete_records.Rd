@@ -11,7 +11,7 @@ delete_records(
   records = NULL,
   safely = NULL,
   batch_size = deprecated(),
-  return_records = TRUE,
+  return_data = TRUE,
   token = NULL,
   ...
 )
@@ -20,9 +20,12 @@ delete_records(
 \item{data}{A data frame with a record ID column matching the value of
 airtable_id_col or rownames with record ID values.}
 
-\item{airtable}{An airtable class object created with \code{\link[=airtable]{airtable()}}. airtable
-must include a request_url attribute. url is ignored if airtable is
-provided. Optional if url or base \emph{and} table are supplied.}
+\item{airtable}{An airtable class object created with \code{\link[=airtable]{airtable()}} or an
+Airtable URL for a table or view (e.g.
+"https://airtable.com/\{baseID\}/\{tableID\}/\{viewID\}"). A URL is
+converted to an airtable object. airtable must include a request_url
+attribute. If airtable is supplied, base, table, and view are ignored.
+Optional if base \emph{and} table are supplied.}
 
 \item{airtable_id_col}{Column name or tidyselect function identifying column
 containing Airtable record IDs. Optional if records is supplied or if
@@ -38,7 +41,7 @@ records and abort if confirmation is not provided.}
 \item{batch_size}{Deprecated. Number of records to delete in a single batch.
 batch_size can now be set using the "rairtable.batch_size" option.}
 
-\item{return_records}{If \code{FALSE}, return the JSON response from the Airtable
+\item{return_data}{If \code{FALSE}, return the JSON response from the Airtable
 API. If \code{TRUE} (default), return a vector of deleted record IDs.}
 
 \item{token}{Airtable personal access token, Defaults to \code{NULL} which is set
@@ -46,20 +49,25 @@ to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat
 "AIRTABLE_API_KEY" (from \code{\link[=get_airtable_api_key]{get_airtable_api_key()}}).}
 
 \item{...}{
-  Arguments passed on to \code{\link[=request_airtable]{request_airtable}}
+  Arguments passed on to \code{\link{request_airtable}}
   \describe{
-    \item{\code{url}}{A URL for an API call or an Airtable view. If url is provided and
-is a valid URL, \code{\link[=request_airtable]{request_airtable()}} returns  \code{httr2::request(url)}. url
-is optional if airtable \emph{or} base and table are supplied. If url is an
-Airtable view, any additional base or table values provided are ignored. If
-airtable is provided, any supplied url is ignored.}
-    \item{\code{base}}{Airtable base id starting with with "app". Optional if url or
-airtable are supplied or if require_base is \code{FALSE}. base and table are
-both required if url and airtable are \code{NULL} and require_base is \code{TRUE}.}
+    \item{\code{base}}{Airtable base id starting with with "app". Optional if airtable
+is supplied or if require_base is \code{FALSE}. base and table are both
+required if airtable is \code{NULL} and require_base is \code{TRUE}.}
     \item{\code{table}}{Airtable table id or name. Table ID values are strings starting
 with "tbl". Optional if require_table is \code{FALSE}.}
     \item{\code{view}}{Airtable view ID. View ID values starts with "viw". Optional if
 require_view is \code{FALSE}.}
+    \item{\code{.req}}{A request object created by \code{\link[httr2:request]{httr2::request()}} or
+\code{\link[=request_airtable]{request_airtable()}}. If .req is provided, any supplied url, api_url, or
+airtable parameters are ignored.}
+    \item{\code{template}}{Template for query parameters passed to
+\code{\link[httr2:req_template]{httr2::req_template()}}, Default: \code{NULL}.}
+    \item{\code{remove_view}}{If \code{TRUE} (default), remove view from request (only using
+view if it is explicitly passed as a query or template parameter). If
+\code{FALSE}, the request url for the supplied .req or created .req object may
+contain a view query parameter parsed from the url or view supplied to
+\code{\link[=airtable]{airtable()}} when creating an airtable object.}
     \item{\code{require_base}}{If \code{TRUE} (default), the string "app" must be included in
 the supplied API request URL.}
     \item{\code{require_table}}{If \code{TRUE}, the string "tbl" must be included in the
@@ -69,6 +77,13 @@ check for a table being present in the API request URL.}
     \item{\code{require_view}}{If \code{TRUE}, the string "viw" must be included in the
 string supplied to url. If \code{FALSE} (default), there is no check
 for a view being present in the API request URL.}
+    \item{\code{method}}{Custom HTTP method}
+    \item{\code{string}}{Passed to \code{\link[httr2:req_user_agent]{httr2::req_user_agent()}}, Default: \code{NULL} (set to
+\code{getOption("rairtable.useragent", default = "rairtable (https://github.com/matthewjrogers/rairtable)")})}
+    \item{\code{allow_key}}{If \code{TRUE}, allow use of an Airtable API key or an Airtable
+personal access token (PAT) to authenticate the request. The metadata API
+does not support the API key so allow_key is set to \code{FALSE} for any
+functions that call that API.}
   }}
 }
 \value{

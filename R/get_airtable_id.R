@@ -1,8 +1,13 @@
 #' Is x an Airtable ID?
 #'
+#' Airtable IDs are a three letter prefix followed by an alphanumeric string
+#' (14 characters for current IDs). Requiring at least 10 characters after the
+#' prefix avoids treating ordinary words that start with the prefix (e.g.
+#' "application" or "recommended") as IDs.
+#'
 #' @param x Object to test.
 #' @noRd
-is_rairtable_id <- function(x, pattern, start = "^", end = "[[:alnum:]]+") {
+is_rairtable_id <- function(x, pattern, start = "^", end = "[[:alnum:]]{10,}$") {
   if (is_null(x) || !is_string(x)) {
     return(FALSE)
   }
@@ -30,7 +35,7 @@ is_base_id <- function(x) {
 is_table_id <- function(x, table_name = NULL) {
   # FIXME: table_name is not exposed so there is no option to pass a table
   # name to is_table_id from get_table_id
-  table_name <- table_name %||% "^tbl[[:alnum:]]+$"
+  table_name <- table_name %||% "^tbl[[:alnum:]]{10,}$"
   is_rairtable_id(x, table_name, "", "")
 }
 
@@ -80,11 +85,13 @@ is_workspace_id <- function(x) {
 #' airtable object.
 #'
 #' @noRd
-get_base_id <- function(base = NULL,
-                        airtable = NULL,
-                        url = NULL,
-                        ...,
-                        call = caller_env()) {
+get_base_id <- function(
+  base = NULL,
+  airtable = NULL,
+  url = NULL,
+  ...,
+  call = caller_env()
+) {
   base <- base %||% airtable %||% url
 
   if (is_base_id(base)) {
@@ -112,12 +119,14 @@ get_base_id <- function(base = NULL,
 #' object.
 #'
 #' @noRd
-get_table_id <- function(table = NULL,
-                         airtable = NULL,
-                         url = NULL,
-                         table_name = NULL,
-                         ...,
-                         call = caller_env()) {
+get_table_id <- function(
+  table = NULL,
+  airtable = NULL,
+  url = NULL,
+  table_name = NULL,
+  ...,
+  call = caller_env()
+) {
   table <- table %||% airtable %||% url
 
   if (is_table_id(table, table_name)) {
@@ -125,7 +134,7 @@ get_table_id <- function(table = NULL,
   }
 
   if (is_airtable_obj(table)) {
-    return(airtable[["table"]])
+    return(table[["table"]])
   }
 
   if (is_url(table)) {
@@ -139,28 +148,25 @@ get_table_id <- function(table = NULL,
   )
 }
 
-#' Get an Airtable column/field ID from a string or URL
+#' Get an Airtable field ID from a string or URL
 #'
 #' Return the provided field ID or a field ID parsed from a URL.
 #'
 #' @noRd
-get_field_id <- function(column = NULL,
-                         url = NULL,
-                         ...,
-                         call = caller_env()) {
-  column <- column %||% url
+get_field_id <- function(field = NULL, url = NULL, ..., call = caller_env()) {
+  field <- field %||% url
 
-  if (is_field_id(column)) {
-    return(column)
+  if (is_field_id(field)) {
+    return(field)
   }
 
-  if (is_url(column)) {
-    return(parse_url_field_id(column))
+  if (is_url(field)) {
+    return(parse_url_field_id(field))
   }
 
   cli_abort(
-    "{.arg column} must be a field ID string or an Airtable URL with a field ID,
-    not {.obj_type_friendly {column}}.",
+    "{.arg field} must be a field ID string or an Airtable URL with a field ID,
+    not {.obj_type_friendly {field}}.",
     call = call
   )
 }
@@ -170,10 +176,7 @@ get_field_id <- function(column = NULL,
 #' Return the provided record ID or a record ID parsed from a URL.
 #'
 #' @noRd
-get_record_id <- function(record = NULL,
-                          url = NULL,
-                          ...,
-                          call = caller_env()) {
+get_record_id <- function(record = NULL, url = NULL, ..., call = caller_env()) {
   record <- record %||% url
 
   if (is_record_id(record)) {
@@ -196,10 +199,12 @@ get_record_id <- function(record = NULL,
 #' Return the provided workspace ID or a workspace ID parsed from a URL.
 #'
 #' @noRd
-get_workspace_id <- function(workspace = NULL,
-                             url = NULL,
-                             ...,
-                             call = caller_env()) {
+get_workspace_id <- function(
+  workspace = NULL,
+  url = NULL,
+  ...,
+  call = caller_env()
+) {
   workspace <- workspace %||% url
 
   if (is_workspace_id(workspace)) {

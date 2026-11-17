@@ -4,3 +4,4 @@
 *.Rproj
 .Ruserdata
 inst/doc
+R/scratch.R

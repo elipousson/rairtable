@@ -11,14 +11,14 @@ create_field(
   type = "singleLineText",
   description = NULL,
   options = NULL,
-  field = NULL,
+  config = NULL,
   token = NULL,
   ...
 )
 
 update_field(
   airtable = NULL,
-  column = NULL,
+  field = NULL,
   name = NULL,
   description = NULL,
   token = NULL,
@@ -26,9 +26,12 @@ update_field(
 )
 }
 \arguments{
-\item{airtable}{An airtable class object created with \code{\link[=airtable]{airtable()}}. airtable
-must include a request_url attribute. url is ignored if airtable is
-provided. Optional if url or base \emph{and} table are supplied.}
+\item{airtable}{An airtable class object created with \code{\link[=airtable]{airtable()}} or an
+Airtable URL for a table or view (e.g.
+"https://airtable.com/\{baseID\}/\{tableID\}/\{viewID\}"). A URL is
+converted to an airtable object. airtable must include a request_url
+attribute. If airtable is supplied, base, table, and view are ignored.
+Optional if base \emph{and} table are supplied.}
 
 \item{name}{Name for the field or column to create.}
 
@@ -44,22 +47,20 @@ See the Airtable Web API documentation on field types and cell values for
 more information: \url{https://airtable.com/developers/web/api/field-model}
 Default: \code{NULL}.}
 
-\item{field}{A named list that can be used to set the name, type,
-description, or options of a field to create. If field is supplied with a
-type, any type value is ignored. Any supplied name, description, or options
-are used if provided.}
+\item{config}{A named list that can be used to set the name, type,
+description, or options of a field to create, e.g. a field config created
+by \code{\link[=make_field_config]{make_field_config()}} or \code{\link[=get_field_config]{get_field_config()}}. Values in config take
+precedence over the name, type, description, and options parameters.}
 
 \item{token}{Airtable personal access token, Defaults to \code{NULL} which is set
 to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat]{get_airtable_pat()}}) or
 "AIRTABLE_API_KEY" (from \code{\link[=get_airtable_api_key]{get_airtable_api_key()}}).}
 
-\item{...}{For \code{\link[=request_airtable]{request_airtable()}}, additional parameters passed to
-\code{\link[=parse_airtable_url]{parse_airtable_url()}} if an Airtable url is provided. For
-\code{\link[=req_airtable]{req_airtable()}}, additional parameters passed to
-\code{\link[httr2:req_template]{httr2::req_template()}} if template is not \code{NULL} or
-\code{\link[httr2:req_url]{httr2::req_url_query()}} if template is \code{NULL}.}
+\item{...}{For \code{\link[=request_airtable]{request_airtable()}}, not used. For \code{\link[=req_airtable]{req_airtable()}},
+additional parameters passed to \code{\link[httr2:req_template]{httr2::req_template()}} if template is not
+\code{NULL} or \code{\link[httr2:req_url_query]{httr2::req_url_query()}} if template is \code{NULL}.}
 
-\item{column}{Field ID of column to update.}
+\item{field}{Field ID of the field to update. Can be a field URL.}
 }
 \value{
 A list with the created field name, field ID, description (if
@@ -70,5 +71,5 @@ Create a field or column in the table of an Airtable base. Find more
 information on the create field API method and field types and options in the
 Airtable Web API documentation:
 \url{https://airtable.com/developers/web/api/create-field} Both name and type are
-required unless field is provided.
+required unless config is provided.
 }

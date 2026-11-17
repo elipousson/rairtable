@@ -37,14 +37,23 @@ name or description are supplied, any existing name or description from the
 model is ignored. model is ignored if table is supplied.}
 
 \item{...}{
-  Arguments passed on to \code{\link[=get_table_model]{get_table_model}}
+  Arguments passed on to \code{\link{get_table_model}}
   \describe{
+    \item{\code{base}}{An Airtable base ID, an airtable object containing a base ID, or
+a URL that can be parsed for a base ID. Optional if url or airtable are
+supplied to the additional parameters passed to \code{\link[=req_airtable]{req_airtable()}}.}
+    \item{\code{tables,table}}{Optional character vector of table names or IDs to
+include in the returned data frame or list. For \code{\link[=get_table_model]{get_table_model()}}, table
+can be a schema but is typically expected to be a table name or ID.}
     \item{\code{schema}}{A base schema list from \code{\link[=get_base_schema]{get_base_schema()}} using
-\code{simplifyVector = FALSE}. Optional if base is supplied (or if airtable or url
-are supplied with additional parameters).}
+\code{simplifyVector = FALSE}. Optional if base is supplied (or if airtable or
+url are supplied with additional parameters).}
     \item{\code{i}}{Index value for the table to return passed to \code{\link[vctrs:vec_slice]{vctrs::vec_slice()}}.
 Defaults to 1 which returns the first table from the tables listed in the
 base schema.}
+    \item{\code{token}}{Airtable personal access token, Defaults to \code{NULL} which is set
+to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat]{get_airtable_pat()}}) or
+"AIRTABLE_API_KEY" (from \code{\link[=get_airtable_api_key]{get_airtable_api_key()}}).}
     \item{\code{simplifyVector}}{Should JSON arrays containing only primitives (i.e.
 booleans, numbers, and strings) be caused to atomic vectors?}
   }}

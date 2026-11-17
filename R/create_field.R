@@ -4,7 +4,7 @@
 #' information on the create field API method and field types and options in the
 #' Airtable Web API documentation:
 #' <https://airtable.com/developers/web/api/create-field> Both name and type are
-#' required unless field is provided.
+#' required unless config is provided.
 #'
 #' @param name Name for the field or column to create.
 #' @param type Field type, defaults to 'singleLineText'. See
@@ -16,29 +16,31 @@
 #'   See the Airtable Web API documentation on field types and cell values for
 #'   more information: <https://airtable.com/developers/web/api/field-model>
 #'   Default: `NULL`.
-#' @param field A named list that can be used to set the name, type,
-#'   description, or options of a field to create. If field is supplied with a
-#'   type, any type value is ignored. Any supplied name, description, or options
-#'   are used if provided.
+#' @param config A named list that can be used to set the name, type,
+#'   description, or options of a field to create, e.g. a field config created
+#'   by [make_field_config()] or [get_field_config()]. Values in config take
+#'   precedence over the name, type, description, and options parameters.
 #' @inheritParams req_airtable
 #' @return A list with the created field name, field ID, description (if
 #'   provided), and options.
 #' @export
 #' @importFrom httr2 req_perform
-create_field <- function(airtable = NULL,
-                         name = NULL,
-                         type = "singleLineText",
-                         description = NULL,
-                         options = NULL,
-                         field = NULL,
-                         token = NULL,
-                         ...) {
-  if (!is_null(field)) {
-    check_list(field)
-    name <- field[["name"]] %||% name
-    type <- field[["type"]] %||% type
-    description <- field[["description"]] %||% description
-    options <- field[["options"]] %||% options
+create_field <- function(
+  airtable = NULL,
+  name = NULL,
+  type = "singleLineText",
+  description = NULL,
+  options = NULL,
+  config = NULL,
+  token = NULL,
+  ...
+) {
+  if (!is_null(config)) {
+    check_list(config)
+    name <- config[["name"]] %||% name
+    type <- config[["type"]] %||% type
+    description <- config[["description"]] %||% description
+    options <- config[["options"]] %||% options
   }
 
   check_name(name)
@@ -67,22 +69,24 @@ create_field <- function(airtable = NULL,
 
 #' @rdname create_field
 #' @name update_field
-#' @param column Field ID of column to update.
+#' @param field Field ID of the field to update. Can be a field URL.
 #' @export
 #' @importFrom httr2 resp_body_json
-update_field <- function(airtable = NULL,
-                         column = NULL,
-                         name = NULL,
-                         description = NULL,
-                         token = NULL,
-                         ...) {
+update_field <- function(
+  airtable = NULL,
+  field = NULL,
+  name = NULL,
+  description = NULL,
+  token = NULL,
+  ...
+) {
   check_name(name, allow_null = TRUE)
   check_field_description(description)
 
   resp <- request_airtable_meta(
     airtable = airtable,
     meta = "update_field",
-    column = column,
+    column = field,
     data = list(
       name = name,
       description = description
@@ -99,9 +103,11 @@ update_field <- function(airtable = NULL,
 #' Check field description
 #'
 #' @noRd
-check_field_description <- function(description = NULL,
-                                    allow_null = TRUE,
-                                    call = caller_env()) {
+check_field_description <- function(
+  description = NULL,
+  allow_null = TRUE,
+  call = caller_env()
+) {
   if (allow_null && is_null(description)) {
     return(invisible(NULL))
   }

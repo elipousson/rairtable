@@ -1,6 +1,5 @@
 httptest2::with_mock_dir("delete_records", {
   test_that("delete_records works", {
-    skip_if_no_pat()
     atbl <- get_rairtable_test_obj()
 
     initial_records <- read_airtable(atbl)
@@ -30,4 +29,36 @@ httptest2::with_mock_dir("delete_records", {
       nrow(records_updated) - nrow(records_deleted)
     )
   })
+})
+
+test_that("delete_records builds a multi-record request with return_data", {
+  atbl <- airtable("tblABCDEFGHIJKLMN", "appABCDEFGHIJKLMN")
+
+  expect_error(
+    httptest2::without_internet(
+      delete_records(
+        airtable = atbl,
+        records = c("recAAAAAAAAAAAAAA", "recBBBBBBBBBBBBBB"),
+        safely = FALSE,
+        return_data = FALSE
+      )
+    ),
+    "records=recAAAAAAAAAAAAAA&records=recBBBBBBBBBBBBBB",
+    class = "httptest2_request"
+  )
+
+  expect_error(
+    httptest2::without_internet(
+      delete_records(
+        airtable = atbl,
+        records = c(
+          "https://airtable.com/appABCDEFGHIJKLMN/tblABCDEFGHIJKLMN/recAAAAAAAAAAAAAA",
+          "https://airtable.com/appABCDEFGHIJKLMN/tblABCDEFGHIJKLMN/recBBBBBBBBBBBBBB"
+        ),
+        safely = FALSE
+      )
+    ),
+    "records=recAAAAAAAAAAAAAA&records=recBBBBBBBBBBBBBB",
+    class = "httptest2_request"
+  )
 })

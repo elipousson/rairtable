@@ -32,7 +32,7 @@ resp_body_records(
 \item{req}{A modified HTTP request from \code{\link[=request_airtable]{request_airtable()}} or a httr2
 function.}
 
-\item{offset}{Offset value to passed to \code{\link[httr2:req_url]{httr2::req_url_query()}} as part of
+\item{offset}{Offset value to passed to \code{\link[httr2:req_url_query]{httr2::req_url_query()}} as part of
 the API call. Intended for developer use only. See the \href{https://airtable.com/developers/web/api/list-records#response-offset}{Airtable API documentation on the offset value}
 is used by the Airtable API.}
 
@@ -47,10 +47,10 @@ response data frame.}
 with fields when type is "combine".}
 
 \item{.name_repair}{One of "unique" (default), "universal", "check_unique",
-"unique_quiet", or "universal_quiet" passed to \code{\link[vctrs:vec_bind]{vctrs::vec_cbind()}}. See
+"unique_quiet", or "universal_quiet" passed to \code{\link[vctrs:vec_cbind]{vctrs::vec_cbind()}}. See
 \link[vctrs:vec_as_names]{vctrs::vec_as_names} for the meaning of these options.}
 
-\item{...}{Additional parameters passed to \code{\link[vctrs:vec_bind]{vctrs::vec_cbind()}}. Not used.}
+\item{...}{Additional parameters passed to \code{\link[vctrs:vec_cbind]{vctrs::vec_cbind()}}. Not used.}
 }
 \description{
 Get the body from API requests with a series of offset values

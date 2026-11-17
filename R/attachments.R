@@ -13,11 +13,13 @@
 #' @param path Path to download file.
 #' @inheritParams rlang::args_error_context
 #' @keywords internal
-download_attachment_field <- function(data,
-                                      field = NULL,
-                                      path = NULL,
-                                      ...,
-                                      call = caller_env()) {
+download_attachment_field <- function(
+  data,
+  field = NULL,
+  path = NULL,
+  ...,
+  call = caller_env()
+) {
   if (!is.null(field)) {
     check_data_frame(data, call = call)
     data <- select_cols(tidyselect::any_of(field), .data = data, call = call)
@@ -59,9 +61,10 @@ attachment_to_url_list <- function(.l, filename = NULL) {
     x[["url"]]
   })
 
-  filename <- filename %||% map(.l, \(x) {
-    x[["filename"]]
-  })
+  filename <- filename %||%
+    map(.l, \(x) {
+      x[["filename"]]
+    })
 
   set_names(unlist(url), unlist(filename))
 }

@@ -19,33 +19,39 @@ request_airtable_meta(
 )
 }
 \arguments{
-\item{url}{A URL for an API call or an Airtable view. If url is provided and
-is a valid URL, \code{\link[=request_airtable]{request_airtable()}} returns  \code{httr2::request(url)}. url
-is optional if airtable \emph{or} base and table are supplied. If url is an
-Airtable view, any additional base or table values provided are ignored. If
-airtable is provided, any supplied url is ignored.}
+\item{url}{An Airtable URL used to find the base, table, or column ID if
+\code{base}, \code{table}, or \code{column} are not supplied. Not used to build the
+request.}
 
-\item{base}{Airtable base id starting with with "app". Optional if url or
-airtable are supplied or if require_base is \code{FALSE}. base and table are
-both required if url and airtable are \code{NULL} and require_base is \code{TRUE}.}
+\item{base}{Airtable base id starting with with "app". Optional if airtable
+is supplied or if require_base is \code{FALSE}. base and table are both
+required if airtable is \code{NULL} and require_base is \code{TRUE}.}
 
 \item{table}{Airtable table id or name. Table ID values are strings starting
 with "tbl". Optional if require_table is \code{FALSE}.}
 
-\item{column}{Column ID, Defaults to \code{NULL}. Only required when \code{meta = "update_field"}. Column can be a field URL.}
+\item{column}{Field ID, Defaults to \code{NULL}. Only required when \code{meta = "update_field"}. Column can be a field URL. The metadata API refers to
+this value as the \code{columnId}.}
 
-\item{airtable}{An airtable class object created with \code{\link[=airtable]{airtable()}}. airtable
-must include a request_url attribute. url is ignored if airtable is
-provided. Optional if url or base \emph{and} table are supplied.}
+\item{airtable}{An airtable class object created with \code{\link[=airtable]{airtable()}} or an
+Airtable URL for a table or view (e.g.
+"https://airtable.com/\{baseID\}/\{tableID\}/\{viewID\}"). A URL is
+converted to an airtable object. airtable must include a request_url
+attribute. If airtable is supplied, base, table, and view are ignored.
+Optional if base \emph{and} table are supplied.}
 
-\item{...}{Additional parameters passed to \code{\link[=req_airtable]{req_airtable()}}}
+\item{...}{Additional parameters passed to \code{\link[=req_airtable]{req_airtable()}} (including
+\code{method} for a custom template).}
 
 \item{meta}{Type of metadata API call to use for bases, tables, or fields.
 Options include "schema_base", "create_base", "list_base", "update_table",
 "create_table", "update_field", or "create_field". Optional if template is
 provided.}
 
-\item{template}{URL template passed to \code{\link[=req_airtable]{req_airtable()}} if meta is \code{NULL}.}
+\item{template}{URL template passed to \code{\link[=req_airtable]{req_airtable()}} if meta is \code{NULL}.
+Any of \code{{base}}, \code{{table}}, and \code{{column}} in the template are filled in
+from the \code{base}, \code{table}, and \code{column} parameters (or from \code{airtable} or
+\code{url}). The template is relative to the API URL, e.g. \code{"meta/whoami"}.}
 
 \item{data}{Data to include in body.}
 
@@ -59,14 +65,32 @@ mentioned in error messages as the source of the error. See the
 \code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
 }
 \value{
-An HTTP response as an S3 list with class httr2_request.
+An HTTP response as an S3 list with class httr2_response.
 }
 \description{
-Create a request to get metadata or update metadata for bases, tables, or
-fields using the Airtable metadata API. Note that the metadata API does \emph{not}
-support the legacy Airtable API key so a personal access token is required.
-Save a personal access token with \code{\link[=set_airtable_pat]{set_airtable_pat()}}. This function does
-not currently support the API for API for views or permissions which are both
-limited to Enterprise user accounts.
+Create and perform a request to get or update metadata for bases, tables, or
+fields using the Airtable metadata API. This is a low-level function that
+the higher-level functions such as \code{\link[=create_table]{create_table()}} and \code{\link[=update_field]{update_field()}} are
+built on. Use it to call metadata API endpoints that do not have a
+corresponding function in this package by supplying a \code{template}.
 }
-\keyword{internal}
+\details{
+Note that the metadata API does \emph{not} support the legacy Airtable API key so
+a personal access token is required. Save a personal access token with
+\code{\link[=set_airtable_pat]{set_airtable_pat()}}. This function does not currently provide a \code{meta}
+option for the API for views or permissions which are both limited to
+Enterprise user accounts.
+}
+\examples{
+\dontrun{
+# List all bases with a built-in request
+request_airtable_meta(meta = "list_base")
+
+# Call an endpoint that does not have a function in this package
+resp <- request_airtable_meta(
+  template = "meta/bases/{base}/webhooks",
+  base = "appXXXXXXXXXXXXX"
+)
+httr2::resp_body_json(resp)
+}
+}

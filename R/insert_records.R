@@ -16,12 +16,14 @@
 #'   returns the parsed API response from [httr2::resp_body_json()].
 #'
 #' @export
-insert_records <- function(data,
-                           airtable = NULL,
-                           typecast = FALSE,
-                           batch_size = deprecated(),
-                           return_data = TRUE,
-                           ...) {
+insert_records <- function(
+  data,
+  airtable = NULL,
+  typecast = FALSE,
+  batch_size = deprecated(),
+  return_data = TRUE,
+  ...
+) {
   # TODO: Add support for inserting records from a list
   check_data_frame(data)
 
@@ -49,12 +51,14 @@ insert_records <- function(data,
 #' @rdname insert_records
 #' @name create_records
 #' @export
-create_records <- function(data,
-                           airtable = NULL,
-                           typecast = FALSE,
-                           batch_size = deprecated(),
-                           return_data = TRUE,
-                           ...) {
+create_records <- function(
+  data,
+  airtable = NULL,
+  typecast = FALSE,
+  batch_size = deprecated(),
+  return_data = TRUE,
+  ...
+) {
   insert_records(
     data = data,
     airtable = airtable,

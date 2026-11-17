@@ -17,9 +17,7 @@
 #' and author information.
 #' - [delete_comment()] returns a list with a comment ID..
 #' @export
-list_comments <- function(airtable = NULL,
-                          record = NULL,
-                          ...) {
+list_comments <- function(airtable = NULL, record = NULL, ...) {
   req <- req_comments(
     airtable = airtable,
     record = record,
@@ -53,10 +51,7 @@ list_comments <- function(airtable = NULL,
 #' @param text String with text of comment to create. Required for
 #'   [create_comment()].
 #' @export
-create_comment <- function(airtable = NULL,
-                           record = NULL,
-                           text,
-                           ...) {
+create_comment <- function(airtable = NULL, record = NULL, text, ...) {
   check_string(text)
 
   req <- req_comments(
@@ -79,10 +74,7 @@ create_comment <- function(airtable = NULL,
 #' @param comment Comment ID (string starting with the text "com"). Required for
 #'   [delete_comment()].
 #' @export
-delete_comment <- function(airtable = NULL,
-                           record = NULL,
-                           comment,
-                           ...) {
+delete_comment <- function(airtable = NULL, record = NULL, comment, ...) {
   check_required(comment)
 
   req <- req_comments(
@@ -104,16 +96,18 @@ delete_comment <- function(airtable = NULL,
 #' Create a request for interacting with the comments API endpoint
 #'
 #' @noRd
-req_comments <- function(airtable = NULL,
-                         record = NULL,
-                         comment = NULL,
-                         ...,
-                         template = NULL,
-                         method = NULL,
-                         data = NULL,
-                         require_record = TRUE,
-                         require_comment = FALSE,
-                         call = caller_env()) {
+req_comments <- function(
+  airtable = NULL,
+  record = NULL,
+  comment = NULL,
+  ...,
+  template = NULL,
+  method = NULL,
+  data = NULL,
+  require_record = TRUE,
+  require_comment = FALSE,
+  call = caller_env()
+) {
   if (is_null(airtable) && is_url(record)) {
     airtable <- record
   }

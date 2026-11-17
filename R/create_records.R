@@ -19,13 +19,15 @@
 #' @keywords internal
 #' @inheritParams rlang::args_error_context
 #' @inheritParams request_airtable
-req_create_records <- function(req = NULL,
-                               ...,
-                               data,
-                               fields_by_id = FALSE,
-                               typecast = TRUE,
-                               token = NULL,
-                               call = caller_env()) {
+req_create_records <- function(
+  req = NULL,
+  ...,
+  data,
+  fields_by_id = FALSE,
+  typecast = TRUE,
+  token = NULL,
+  call = caller_env()
+) {
   req <- req %||%
     req_auth_airtable(
       req = request_airtable(..., call = call),

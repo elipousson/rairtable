@@ -10,7 +10,8 @@ test_that("set_airtable_api_key works", {
       expect_identical(
         suppressWarnings(set_airtable_api_key(
           key = "test_key",
-          install = FALSE, overwrite = TRUE
+          install = FALSE,
+          overwrite = TRUE
         )),
         "test_key"
       )

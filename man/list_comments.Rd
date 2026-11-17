@@ -13,9 +13,12 @@ create_comment(airtable = NULL, record = NULL, text, ...)
 delete_comment(airtable = NULL, record = NULL, comment, ...)
 }
 \arguments{
-\item{airtable}{An airtable class object created with \code{\link[=airtable]{airtable()}}. airtable
-must include a request_url attribute. url is ignored if airtable is
-provided. Optional if url or base \emph{and} table are supplied.}
+\item{airtable}{An airtable class object created with \code{\link[=airtable]{airtable()}} or an
+Airtable URL for a table or view (e.g.
+"https://airtable.com/\{baseID\}/\{tableID\}/\{viewID\}"). A URL is
+converted to an airtable object. airtable must include a request_url
+attribute. If airtable is supplied, base, table, and view are ignored.
+Optional if base \emph{and} table are supplied.}
 
 \item{record}{Record ID (a string starting with "rec") or an Airtable record
 URL. If record is a URL, no additional parameters are required. Otherwise,

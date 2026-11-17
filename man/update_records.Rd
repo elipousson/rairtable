@@ -68,20 +68,25 @@ to environmental variable for "AIRTABLE_PAT" (from \code{\link[=get_airtable_pat
 "AIRTABLE_API_KEY" (from \code{\link[=get_airtable_api_key]{get_airtable_api_key()}}).}
 
 \item{...}{
-  Arguments passed on to \code{\link[=request_airtable]{request_airtable}}
+  Arguments passed on to \code{\link{request_airtable}}
   \describe{
-    \item{\code{url}}{A URL for an API call or an Airtable view. If url is provided and
-is a valid URL, \code{\link[=request_airtable]{request_airtable()}} returns  \code{httr2::request(url)}. url
-is optional if airtable \emph{or} base and table are supplied. If url is an
-Airtable view, any additional base or table values provided are ignored. If
-airtable is provided, any supplied url is ignored.}
-    \item{\code{base}}{Airtable base id starting with with "app". Optional if url or
-airtable are supplied or if require_base is \code{FALSE}. base and table are
-both required if url and airtable are \code{NULL} and require_base is \code{TRUE}.}
+    \item{\code{base}}{Airtable base id starting with with "app". Optional if airtable
+is supplied or if require_base is \code{FALSE}. base and table are both
+required if airtable is \code{NULL} and require_base is \code{TRUE}.}
     \item{\code{table}}{Airtable table id or name. Table ID values are strings starting
 with "tbl". Optional if require_table is \code{FALSE}.}
     \item{\code{view}}{Airtable view ID. View ID values starts with "viw". Optional if
 require_view is \code{FALSE}.}
+    \item{\code{.req}}{A request object created by \code{\link[httr2:request]{httr2::request()}} or
+\code{\link[=request_airtable]{request_airtable()}}. If .req is provided, any supplied url, api_url, or
+airtable parameters are ignored.}
+    \item{\code{template}}{Template for query parameters passed to
+\code{\link[httr2:req_template]{httr2::req_template()}}, Default: \code{NULL}.}
+    \item{\code{remove_view}}{If \code{TRUE} (default), remove view from request (only using
+view if it is explicitly passed as a query or template parameter). If
+\code{FALSE}, the request url for the supplied .req or created .req object may
+contain a view query parameter parsed from the url or view supplied to
+\code{\link[=airtable]{airtable()}} when creating an airtable object.}
     \item{\code{require_base}}{If \code{TRUE} (default), the string "app" must be included in
 the supplied API request URL.}
     \item{\code{require_table}}{If \code{TRUE}, the string "tbl" must be included in the
@@ -91,6 +96,13 @@ check for a table being present in the API request URL.}
     \item{\code{require_view}}{If \code{TRUE}, the string "viw" must be included in the
 string supplied to url. If \code{FALSE} (default), there is no check
 for a view being present in the API request URL.}
+    \item{\code{method}}{Custom HTTP method}
+    \item{\code{string}}{Passed to \code{\link[httr2:req_user_agent]{httr2::req_user_agent()}}, Default: \code{NULL} (set to
+\code{getOption("rairtable.useragent", default = "rairtable (https://github.com/matthewjrogers/rairtable)")})}
+    \item{\code{allow_key}}{If \code{TRUE}, allow use of an Airtable API key or an Airtable
+personal access token (PAT) to authenticate the request. The metadata API
+does not support the API key so allow_key is set to \code{FALSE} for any
+functions that call that API.}
   }}
 }
 \value{

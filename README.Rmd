@@ -82,9 +82,9 @@ atbl <- airtable(
 atbl
 ```
 
-The airtable object is a list that holds your base ID and a request URL. 
+The airtable object is a list that holds your base ID and a request URL. It can also hold a table name and a table description when those are known. The description is the description defined for the table in Airtable and is left blank if the table does not have one.
 
-You can also use the URL for your base to create an airtable object. Note, that the URL typically includes a view as well as a table. If a view is filtered to only show a subset of records, only the records you can see in that view can be listed if you pass the airtable object to `read_records()` or `list_records()`.
+You can also use the URL for your base to create an airtable object. Note, that the URL typically includes a view as well as a table. If a view is filtered to only show a subset of records, only the records you can see in that view can be listed if you pass the airtable object to `read_airtable()` or `list_records()`.
 
 ```{r}
 atbl <- airtable(
@@ -109,6 +109,31 @@ get_record(atbl, record = "rec0GH7OYgPEjRaSb")
 ```
 
 `list_records()` is similar to `read_airtable()` but supports some additional features from the API.
+
+### Working with Airtable URLs
+
+Anywhere you would otherwise copy a base, table, or record ID, you can paste the URL from your browser instead:
+
+- `airtable()` accepts a table or view URL. The base, table, and view IDs are parsed from the URL.
+- `delete_records()` and `update_records()` accept a vector of record URLs (the URL you get from "Copy record URL" in Airtable) in place of record IDs.
+- `parse_airtable_url()` returns the base, table, view, and field IDs found in a URL, and `is_airtable_url()` tests whether a string is an Airtable URL.
+
+Shared URLs (starting with "https://airtable.com/shr") and URLs that use a table name instead of a table ID are not supported. The URL prefix can be changed with the `rairtable.base_url` option.
+
+```{r, eval=FALSE}
+url <- "https://airtable.com/app8uSq5M3ia6FZUR/tblvGyhX2yg0d22gz"
+
+parse_airtable_url(url)
+#> $base
+#> [1] "app8uSq5M3ia6FZUR"
+#>
+#> $table
+#> [1] "tblvGyhX2yg0d22gz"
+
+delete_records(records = c(
+  "https://airtable.com/app8uSq5M3ia6FZUR/tblvGyhX2yg0d22gz/rec0GH7OYgPEjRaSb"
+))
+```
 
 ### Insert records 
 

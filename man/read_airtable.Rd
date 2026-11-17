@@ -83,7 +83,7 @@ model is used to validate fields and sort parameters and to arrange columns
 to match the order of the table model.}
 
 \item{.name_repair}{One of "unique" (default), "universal", "check_unique",
-"unique_quiet", or "universal_quiet" passed to \code{\link[vctrs:vec_bind]{vctrs::vec_cbind()}}. See
+"unique_quiet", or "universal_quiet" passed to \code{\link[vctrs:vec_cbind]{vctrs::vec_cbind()}}. See
 \link[vctrs:vec_as_names]{vctrs::vec_as_names} for the meaning of these options.}
 
 \item{token}{Airtable personal access token, Defaults to \code{NULL} which is set
@@ -131,11 +131,11 @@ Options including "id", "createdTime", and "commentCount". Defaults to
 \code{c("id", "createdTime")}. If metadata is \code{NULL}, no additional fields are
 added to the returned data frame.}
 
-\item{offset}{Offset value to passed to \code{\link[httr2:req_url]{httr2::req_url_query()}} as part of
+\item{offset}{Offset value to passed to \code{\link[httr2:req_url_query]{httr2::req_url_query()}} as part of
 the API call. Intended for developer use only. See the \href{https://airtable.com/developers/web/api/list-records#response-offset}{Airtable API documentation on the offset value}
 is used by the Airtable API.}
 
-\item{simplifyVector}{Passed to \code{\link[httr2:req_body]{httr2::req_body_json()}}. If \code{FALSE},
+\item{simplifyVector}{Passed to \code{\link[httr2:req_body_json]{httr2::req_body_json()}}. If \code{FALSE},
 \code{\link[=get_record]{get_record()}} and \code{\link[=list_records]{list_records()}} both return named lists of records.}
 
 \item{record}{Record ID (a string starting with "rec"). Required for

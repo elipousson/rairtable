@@ -38,24 +38,26 @@
 #'
 #' @export
 #' @importFrom tidyselect everything
-update_records <- function(data,
-                           airtable = NULL,
-                           airtable_id_col = NULL,
-                           columns = tidyselect::everything(),
-                           records = NULL,
-                           model = NULL,
-                           fields_by_id = FALSE,
-                           typecast = FALSE,
-                           return_data = TRUE,
-                           safely = NULL,
-                           token = NULL,
-                           ...) {
+update_records <- function(
+  data,
+  airtable = NULL,
+  airtable_id_col = NULL,
+  columns = tidyselect::everything(),
+  records = NULL,
+  model = NULL,
+  fields_by_id = FALSE,
+  typecast = FALSE,
+  return_data = TRUE,
+  safely = NULL,
+  token = NULL,
+  ...
+) {
   if (is_null(records)) {
     airtable_id_col <- airtable_id_col %||%
       getOption("rairtable.id_col", "airtable_record_id")
     records <- get_record_id_col(data = data, id_col = airtable_id_col)
   } else if (all(is_url(records))) {
-    records <- parse_url_record_id(records)
+    records <- parse_record_urls(records)
   }
 
   check_character(records)
@@ -78,8 +80,10 @@ update_records <- function(data,
       ),
       error = function(cnd) {
         cli_abort(
-          c("{.arg data} has column names that can't be found
-            in the fields of the supplied {.arg model}"),
+          c(
+            "{.arg data} has column names that can't be found
+            in the fields of the supplied {.arg model}"
+          ),
           parent = cnd
         )
       }
@@ -126,15 +130,17 @@ update_records <- function(data,
 #' @param records,record Record ID or IDs to update as a character vector.
 #' @keywords internal
 #' @importFrom httr2 req_body_json req_perform
-req_update_records <- function(req = NULL,
-                               ...,
-                               records,
-                               data,
-                               fields_by_id = FALSE,
-                               typecast = FALSE,
-                               method = NULL,
-                               token = NULL,
-                               call = caller_env()) {
+req_update_records <- function(
+  req = NULL,
+  ...,
+  records,
+  data,
+  fields_by_id = FALSE,
+  typecast = FALSE,
+  method = NULL,
+  token = NULL,
+  call = caller_env()
+) {
   method <- match.arg(method, c("PATCH", "PUT"))
 
   if (is_null(req)) {
@@ -204,14 +210,16 @@ req_update_records <- function(req = NULL,
 #' @name req_update_record
 #' @keywords internal
 #' @importFrom httr2 req_perform
-req_update_record <- function(req = NULL,
-                              ...,
-                              record,
-                              data,
-                              typecast = TRUE,
-                              method = NULL,
-                              token = NULL,
-                              call = caller_env()) {
+req_update_record <- function(
+  req = NULL,
+  ...,
+  record,
+  data,
+  typecast = TRUE,
+  method = NULL,
+  token = NULL,
+  call = caller_env()
+) {
   method <- match.arg(method, c("PATCH", "PUT"))
 
   check_string(record, allow_empty = FALSE, call = call)
@@ -243,11 +251,13 @@ req_update_record <- function(req = NULL,
 #' @noRd
 #' @importFrom tibble has_rownames
 #' @importFrom tidyselect all_of
-get_record_id_col <- function(data,
-                              id_col = NULL,
-                              id_col_arg = caller_arg(id_col),
-                              id_from_col = TRUE,
-                              call = caller_env()) {
+get_record_id_col <- function(
+  data,
+  id_col = NULL,
+  id_col_arg = caller_arg(id_col),
+  id_from_col = TRUE,
+  call = caller_env()
+) {
   check_data_frame(data, call = call)
 
   if (!id_from_col && tibble::has_rownames(data)) {
@@ -267,7 +277,11 @@ get_record_id_col <- function(data,
       )
     }
 
-    data <- select_cols(tidyselect::all_of(id_col), .data = data, error_call = call)
+    data <- select_cols(
+      tidyselect::all_of(id_col),
+      .data = data,
+      error_call = call
+    )
     n_cols <- ncol(data)
 
     if (n_cols != 1) {
@@ -299,10 +313,12 @@ get_record_id_col <- function(data,
 #' Get selected data columns (optionally dropping id column)
 #'
 #' @noRd
-get_data_columns <- function(data,
-                             columns = NULL,
-                             id_col = NULL,
-                             call = caller_env()) {
+get_data_columns <- function(
+  data,
+  columns = NULL,
+  id_col = NULL,
+  call = caller_env()
+) {
   check_data_frame(data, call = call)
 
   if (!is_null(id_col)) {
@@ -316,9 +332,7 @@ get_data_columns <- function(data,
 #' Get names of selected columns
 #'
 #' @noRd
-get_data_colnames <- function(...,
-                              .data,
-                              call = caller_env()) {
+get_data_colnames <- function(..., .data, call = caller_env()) {
   names(select_cols(..., .data = .data, error_call = call))
 }
 
@@ -326,18 +340,20 @@ get_data_colnames <- function(...,
 #'
 #' @noRd
 #' @importFrom tidyselect eval_select
-select_cols <- function(...,
-                        .data,
-                        .field = NULL,
-                        .strict = TRUE,
-                        .include = NULL,
-                        .exclude = NULL,
-                        .name_spec = NULL,
-                        .allow_rename = TRUE,
-                        .allow_empty = TRUE,
-                        .allow_predicates = TRUE,
-                        .env = caller_env(),
-                        error_call = caller_env()) {
+select_cols <- function(
+  ...,
+  .data,
+  .field = NULL,
+  .strict = TRUE,
+  .include = NULL,
+  .exclude = NULL,
+  .name_spec = NULL,
+  .allow_rename = TRUE,
+  .allow_empty = TRUE,
+  .allow_predicates = TRUE,
+  .env = caller_env(),
+  error_call = caller_env()
+) {
   pos <- tidyselect::eval_select(
     expr = expr(...),
     data = .data,

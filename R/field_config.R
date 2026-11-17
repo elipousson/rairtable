@@ -24,12 +24,14 @@
 #' @inheritParams rlang::args_error_context
 #' @seealso field_types
 #' @export
-make_field_config <- function(field = NULL,
-                              name = NULL,
-                              type = NULL,
-                              ...,
-                              error_arg = caller_arg(field),
-                              call = caller_env()) {
+make_field_config <- function(
+  field = NULL,
+  name = NULL,
+  type = NULL,
+  ...,
+  error_arg = caller_arg(field),
+  call = caller_env()
+) {
   field <- field %||% list(name = name, type = type, ...)
 
   if (is_list_of_lists(field)) {
@@ -58,11 +60,13 @@ make_field_config <- function(field = NULL,
 #' Note that this function does not yet validate field type specific options.
 #'
 #' @noRd
-check_field_config <- function(field,
-                               error_arg = caller_arg(field),
-                               name_arg = "name",
-                               type_arg = "type",
-                               call = caller_env()) {
+check_field_config <- function(
+  field,
+  error_arg = caller_arg(field),
+  name_arg = "name",
+  type_arg = "type",
+  call = caller_env()
+) {
   check_list(field, arg = error_arg, call = call)
 
   if (!all(has_name(field, c("name", "type")))) {
@@ -94,11 +98,13 @@ check_field_config <- function(field,
 #' @inheritParams rlang::args_error_context
 #' @keywords internal
 #' @noRd
-make_list_of_lists <- function(data,
-                               arg = caller_arg(data),
-                               max_rows = NULL,
-                               cols = NULL,
-                               call = caller_env()) {
+make_list_of_lists <- function(
+  data,
+  arg = caller_arg(data),
+  max_rows = NULL,
+  cols = NULL,
+  call = caller_env()
+) {
   check_required(data, call = call)
 
   if (!is.data.frame(data)) {
@@ -150,13 +156,15 @@ make_list_of_lists <- function(data,
 #' Make a field array
 #'
 #' @noRd
-make_field_array <- function(fields,
-                             table = NULL,
-                             values = NULL,
-                             ...,
-                             arg = caller_arg(fields),
-                             token = NULL,
-                             call = caller_env()) {
+make_field_array <- function(
+  fields,
+  table = NULL,
+  values = NULL,
+  ...,
+  arg = caller_arg(fields),
+  token = NULL,
+  call = caller_env()
+) {
   field_array <- try_fetch(
     lapply(
       X = make_list_of_lists(
@@ -196,7 +204,8 @@ make_field_array <- function(fields,
 
     if (any(nm_in_values)) {
       cli_abort(
-        c("{.arg {arg}} can't use any existing field names.",
+        c(
+          "{.arg {arg}} can't use any existing field names.",
           "*" = "Rename field{?s} {.val {field_array_nm[nm_in_values]}}
           in {.arg fields} or target {.arg table}."
         ),
@@ -213,10 +222,12 @@ make_field_array <- function(fields,
 #' This function could possibly be combined with check_airtable_fields_schema()
 #'
 #' @noRd
-check_field_array <- function(fields,
-                              allow_null = FALSE,
-                              allow_names = c("type", "name", "description", "options"),
-                              call = caller_env()) {
+check_field_array <- function(
+  fields,
+  allow_null = FALSE,
+  allow_names = c("type", "name", "description", "options"),
+  call = caller_env()
+) {
   if (allow_null && is_null(fields)) {
     return(invisible(NULL))
   }
@@ -256,14 +267,16 @@ check_field_array <- function(fields,
 #' @param ... Additional parameters. Unused.
 #' @inheritParams rlang::args_error_context
 #' @export
-get_field_config <- function(fields = NULL,
-                             table = NULL,
-                             schema = NULL,
-                             model = NULL,
-                             linkedTableId = NULL,
-                             viewIdForRecordSelection = NULL,
-                             ...,
-                             call = caller_env()) {
+get_field_config <- function(
+  fields = NULL,
+  table = NULL,
+  schema = NULL,
+  model = NULL,
+  linkedTableId = NULL,
+  viewIdForRecordSelection = NULL,
+  ...,
+  call = caller_env()
+) {
   fields <- get_model_fields(fields, table, schema, model, call = call)
 
   check_list(fields, call = call)
@@ -279,28 +292,32 @@ get_field_config <- function(fields = NULL,
 #' Get fields list from base or table schema
 #'
 #' @noRd
-get_model_fields <- function(fields = NULL,
-                             table = NULL,
-                             schema = NULL,
-                             model = NULL,
-                             ...,
-                             call = caller_env()) {
+get_model_fields <- function(
+  fields = NULL,
+  table = NULL,
+  schema = NULL,
+  model = NULL,
+  ...,
+  call = caller_env()
+) {
   if (is_list_of_lists(fields)) {
     return(fields)
   }
 
-  model <- model %||% get_table_model(
-    table = table,
-    schema = schema,
-    ...,
-    call = call
-  )
+  model <- model %||%
+    get_table_model(
+      table = table,
+      schema = schema,
+      ...,
+      call = call
+    )
 
   fields <- model[["fields"]]
 
   if (is_empty(fields)) {
     cli_abort(
-      c("{.arg model} must be a list with fields.",
+      c(
+        "{.arg model} must be a list with fields.",
         "*" = "Check input {.arg table}, {.arg schema},
         or {.arg model} for issues."
       ),
@@ -321,9 +338,11 @@ get_model_fields <- function(fields = NULL,
 #'   selection on multipleRecordLinks field type.
 #' @keywords internal
 #' @importFrom vctrs list_drop_empty
-prep_table_field <- function(field,
-                             linkedTableId = NULL,
-                             viewIdForRecordSelection = NULL) {
+prep_table_field <- function(
+  field,
+  linkedTableId = NULL,
+  viewIdForRecordSelection = NULL
+) {
   fld_name <- field[["name"]]
   fld_type <- field[["type"]]
   fld_options <- field[["options"]]

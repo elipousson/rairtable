@@ -17,11 +17,13 @@
 #' get_airtable_pat()
 #' }
 #' @export
-set_airtable_pat <- function(pat,
-                             install = FALSE,
-                             overwrite = FALSE,
-                             default = "AIRTABLE_PAT",
-                             call = caller_env()) {
+set_airtable_pat <- function(
+  pat,
+  install = FALSE,
+  overwrite = FALSE,
+  default = "AIRTABLE_PAT",
+  call = caller_env()
+) {
   default <- getOption("rairtable.pat_default", default)
 
   set_airtable_token(pat, install, overwrite, default, call)
@@ -30,14 +32,17 @@ set_airtable_pat <- function(pat,
 #' @rdname set_airtable_pat
 #' @name get_airtable_pat
 #' @export
-get_airtable_pat <- function(pat = NULL,
-                             default = "AIRTABLE_PAT",
-                             call = caller_env()) {
+get_airtable_pat <- function(
+  pat = NULL,
+  default = "AIRTABLE_PAT",
+  call = caller_env()
+) {
   default <- getOption("rairtable.pat_default", default)
 
   get_airtable_token(
     pat,
-    message = c("Personal access token can't be found at {.envvar {default}}.",
+    message = c(
+      "Personal access token can't be found at {.envvar {default}}.",
       "*" = "Use {.fn set_airtable_pat} to set {.envvar {default}}."
     ),
     default = default,
@@ -48,12 +53,14 @@ get_airtable_pat <- function(pat = NULL,
 #' Get an Airtable Personal Access Token or an API Key (if PAT is not available)
 #'
 #' @keywords internal
-get_airtable_pat_or_key <- function(token = NULL,
-                                    default = c(
-                                      "AIRTABLE_PAT",
-                                      "AIRTABLE_API_KEY"
-                                    ),
-                                    call = caller_env()) {
+get_airtable_pat_or_key <- function(
+  token = NULL,
+  default = c(
+    "AIRTABLE_PAT",
+    "AIRTABLE_API_KEY"
+  ),
+  call = caller_env()
+) {
   try_fetch(
     get_airtable_pat(
       token,
@@ -84,11 +91,13 @@ get_airtable_pat_or_key <- function(token = NULL,
 #' @importFrom rlang caller_call call_name
 #' @importFrom cli cli_bullets cli_alert_success
 #' @importFrom utils read.table write.table
-set_airtable_token <- function(token,
-                               install = FALSE,
-                               overwrite = FALSE,
-                               default = "AIRTABLE_PAT",
-                               call = caller_env()) {
+set_airtable_token <- function(
+  token,
+  install = FALSE,
+  overwrite = FALSE,
+  default = "AIRTABLE_PAT",
+  call = caller_env()
+) {
   check_bool(install, call = call)
 
   if (!install) {
@@ -118,7 +127,8 @@ set_airtable_token <- function(token,
 
     if (has_default && !overwrite) {
       cli_abort(
-        c("{.envvar {default}} already exists in your {.file .Renviron}.",
+        c(
+          "{.envvar {default}} already exists in your {.file .Renviron}.",
           "*" = "Set {.arg overwrite = TRUE} to replace this token."
         ),
         call = call
@@ -131,9 +141,13 @@ set_airtable_token <- function(token,
     if (has_default) {
       oldenv <- utils::read.table(renv, stringsAsFactors = FALSE)
       newenv <- oldenv[!grepl(default, readLines(renv)), ]
-      utils::write.table(newenv, renv,
+      utils::write.table(
+        newenv,
+        renv,
         quote = FALSE,
-        sep = "\n", col.names = FALSE, row.names = FALSE
+        sep = "\n",
+        col.names = FALSE,
+        row.names = FALSE
       )
     }
   } else {
@@ -157,10 +171,12 @@ set_airtable_token <- function(token,
 #' @rdname set_airtable_token
 #' @name get_airtable_token
 #' @keywords internal
-get_airtable_token <- function(token = NULL,
-                               default = "AIRTABLE_PAT",
-                               call = caller_env(),
-                               ...) {
+get_airtable_token <- function(
+  token = NULL,
+  default = "AIRTABLE_PAT",
+  call = caller_env(),
+  ...
+) {
   check_string(default, call = call)
   token <- token %||% Sys.getenv(default)
 

@@ -1,12 +1,12 @@
 httptest2::with_mock_dir("create_table", {
   test_that("create_table and update_table work", {
-    skip_if_no_pat()
 
     atbl <- get_rairtable_test_obj()
     random_abb <- sample(state.abb, 1)
 
     atbl_tbl <- create_table(
-      airtable = atbl,
+      # airtable = atbl,
+      base = atbl$base,
       name = random_abb,
       fields = list(list(name = "Primary field", type = "singleLineText"))
     )

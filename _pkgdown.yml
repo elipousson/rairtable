@@ -38,7 +38,11 @@ reference:
       Functions for setting up a connection to airtable
     contents:
       - set_airtable_api_key
+      - set_airtable_pat
+      - rairtable-config
       - airtable
+      - airtable_base
+      - list_bases
   - title: "CRUD Functions"
     desc: >
       Functions for create-read-update-delete (CRUD) functionality in Airtable
@@ -47,4 +51,31 @@ reference:
       - insert_records
       - update_records
       - delete_records
-
+  - title: "Airtable URLs"
+    desc: >
+      Create `airtable` objects from URLs copied from the browser, or parse and
+      validate Airtable URLs and API URLs
+    contents:
+      - airtable_url
+  - title: "Metadata and Schema"
+    desc: >
+      Functions for creating and updating bases, tables, and fields using the
+      Airtable metadata API
+    contents:
+      - create_base
+      - create_table
+      - create_field
+      - make_table_config
+      - make_field_config
+      - field_types
+      - airtable_fields_schema
+  - title: "Comments"
+    contents:
+      - list_comments
+  - title: "Low-level requests"
+    desc: >
+      Build and perform requests directly, e.g. for parts of the Airtable API
+      that do not have a corresponding function in this package
+    contents:
+      - request_airtable
+      - request_airtable_meta

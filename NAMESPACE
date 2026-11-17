@@ -45,6 +45,7 @@ export(parse_airtable_url)
 export(read_airtable)
 export(req_airtable)
 export(request_airtable)
+export(request_airtable_meta)
 export(set_airtable_api_key)
 export(set_airtable_pat)
 export(update_field)
@@ -52,51 +53,65 @@ export(update_records)
 export(update_table)
 import(rlang)
 import(vctrs)
-importFrom(cli,cli_abort)
-importFrom(cli,cli_alert_success)
-importFrom(cli,cli_alert_warning)
-importFrom(cli,cli_bullets)
-importFrom(cli,cli_progress_along)
-importFrom(cli,cli_progress_step)
-importFrom(cli,cli_rule)
-importFrom(cli,cli_text)
-importFrom(cli,cli_warn)
-importFrom(cli,pb_bar)
-importFrom(cli,pb_percent)
-importFrom(cli,symbol)
+importFrom(cli,
+  cli_abort,
+  cli_alert_success,
+  cli_alert_warning,
+  cli_bullets,
+  cli_progress_along,
+  cli_progress_step,
+  cli_rule,
+  cli_text,
+  cli_warn,
+  pb_bar,
+  pb_percent,
+  symbol
+)
 importFrom(glue,glue)
-importFrom(httr2,req_auth_bearer_token)
-importFrom(httr2,req_body_json)
-importFrom(httr2,req_perform)
-importFrom(httr2,req_template)
-importFrom(httr2,req_throttle)
-importFrom(httr2,req_url_path_append)
-importFrom(httr2,req_url_query)
-importFrom(httr2,req_user_agent)
-importFrom(httr2,request)
-importFrom(httr2,resp_body_json)
+importFrom(httr2,
+  req_auth_bearer_token,
+  req_body_json,
+  req_perform,
+  req_template,
+  req_throttle,
+  req_url_path_append,
+  req_url_query,
+  req_user_agent,
+  request,
+  resp_body_json
+)
 importFrom(lifecycle,deprecated)
-importFrom(rlang,call_name)
-importFrom(rlang,caller_call)
-importFrom(rlang,current_env)
-importFrom(rlang,exec)
-importFrom(rlang,with_options)
-importFrom(rlang,zap)
-importFrom(tibble,as_tibble)
-importFrom(tibble,column_to_rownames)
-importFrom(tibble,has_rownames)
-importFrom(tidyselect,all_of)
-importFrom(tidyselect,any_of)
-importFrom(tidyselect,eval_select)
-importFrom(tidyselect,everything)
-importFrom(utils,read.table)
-importFrom(utils,write.table)
-importFrom(vctrs,list_drop_empty)
-importFrom(vctrs,new_vctr)
-importFrom(vctrs,obj_check_list)
-importFrom(vctrs,vec_cbind)
-importFrom(vctrs,vec_data)
-importFrom(vctrs,vec_init)
-importFrom(vctrs,vec_rbind)
-importFrom(vctrs,vec_recycle)
-importFrom(vctrs,vec_slice)
+importFrom(rlang,
+  call_name,
+  caller_call,
+  current_env,
+  exec,
+  with_options,
+  zap
+)
+importFrom(tibble,
+  as_tibble,
+  column_to_rownames,
+  has_rownames
+)
+importFrom(tidyselect,
+  all_of,
+  any_of,
+  eval_select,
+  everything
+)
+importFrom(utils,
+  read.table,
+  write.table
+)
+importFrom(vctrs,
+  list_drop_empty,
+  new_vctr,
+  obj_check_list,
+  vec_cbind,
+  vec_data,
+  vec_init,
+  vec_rbind,
+  vec_recycle,
+  vec_slice
+)
